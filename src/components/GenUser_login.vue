@@ -32,27 +32,20 @@
       </div>
       <div class="clear"></div>
     </div>
-
     <div class="pop-up">
-      <div id="small-dialog" class="book-form mfp-hide">
-        <h3>IGSDN用户注册</h3>
-        <form action="" method="post">
-          <input type="text" name="Username" placeholder="用户名" required="">
-          <input type="text" name="Email" class="email" placeholder="邮件" required="">
-          <input type="password" name="Password" class="password" placeholder="密码" required="">
-          <input type="password" name="Password" class="password" placeholder="重复密码" required="">
-          <input type="submit" value="点击注册">
-        </form>
-      </div>
+    <Register/>
     </div>
-
   </div>
 </template>
 
 <script>
-  import axios from '_axios@0.18.0@axios/index'
+  import axios from 'axios'
+  import Register from './GenUser_register'
 
   export default {
+    components:{
+      Register
+    },
     data() {
       return {
         loginName: null,
@@ -64,7 +57,7 @@
       checkLogin() {
         const {loginName, password} = this
         if (loginName && password) {
-          axios.post('cgenUser/checkLogin', {loginName, password}).then((res) => {
+          axios.post('http://localhost:8080/IGSDN/genUser/checkLogin', {loginName, password}).then((res) => {
             console.log(res)
             if (res.data) {
               this.msg = ''

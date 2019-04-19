@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import axios from '_axios@0.18.0@axios/index'
+  import axios from 'axios'
   export default {
     name: "Hello",
     data() {
