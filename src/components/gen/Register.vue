@@ -23,7 +23,7 @@
   import axios from 'axios'
 
   export default {
-    name: "GenUser_regist",
+    name: "Register",
     data() {
       return {
         Uname: '',
