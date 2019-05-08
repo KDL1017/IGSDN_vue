@@ -98,7 +98,6 @@
                 if (loginName && password) {
                     this.isLoading = true
                     axios.post('/IGSDN/genUser/checkLogin', {loginName, password}).then((res) => {
-                        console.log(res)
                         this.isLoading = false
                         if (res.data) {
                             this.msg = ''

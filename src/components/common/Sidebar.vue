@@ -42,7 +42,7 @@
                     {
                         icon: 'el-icon-lx-home',
                         index: 'recommendation',
-                        title: '个性推荐'
+                        title: '首页'
                     },
                     {
                         icon: 'el-icon-document',
