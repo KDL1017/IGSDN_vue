@@ -5,6 +5,7 @@ Vue.use(Router);
 
 export default new Router({
     routes: [
+
         {
             path: '/genUserLogin',
             component: resolve => require(['../components/gen/Login.vue'], resolve)
@@ -16,16 +17,30 @@ export default new Router({
         {
             path: '/genUser',
             component: resolve => require(['../components/common/Home.vue'], resolve),
-            meta: {title: '自述文件'},
             children: [
                 {
                     path: '/',
                     redirect: 'recommendation'
                 },
                 {
+                    path: 'changePassword',
+                    component: resolve => require(['../components/gen/ChangePassword.vue'], resolve)
+
+                },
+                {
+                    path: 'userCenter',
+                    component: resolve => require(['../components/gen/UserCenter.vue'], resolve)
+
+                },
+                {
+                    path: 'changePerson',
+                    component: resolve => require(['../components/common/ChangePerson.vue'], resolve)
+
+                },
+                {
                     path: 'recommendation',
                     component: resolve => require(['../components/page/Recommendation.vue'], resolve),
-                    meta: {title: '个性推荐'}
+                    meta: {title: '首页'}
                 },
                 {
                     path: 'knowledge-:category',

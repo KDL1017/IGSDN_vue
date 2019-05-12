@@ -28,12 +28,16 @@
                         {{username}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
+
+                        <el-dropdown-item divided command="changePassword">修改密码</el-dropdown-item>
+                        <el-dropdown-item divided command="userCenter">个人中心</el-dropdown-item>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
         </div>
     </div>
+
 </template>
 <script>
     import bus from '../common/bus';
@@ -57,9 +61,17 @@
             // 用户名下拉菜单选择事件
             handleCommand(command) {
                 if (command == 'loginout') {
-                    localStorage.removeItem('ms_username')
-                    this.$router.push('/login');
+                    localStorage.removeItem('t_user')
+                    localStorage.removeItem('user_msg')
+                    this.$router.push('/genUserLogin');
                 }
+                if (command == 'changePassword') {
+                    this.$router.push('changePassword');
+                }
+                if (command == 'userCenter') {
+                    this.$router.push('userCenter');
+                }
+
             },
             // 侧边栏折叠
             collapseChage() {
