@@ -19,7 +19,7 @@
 </template>
 
 <script>
-    import axios from '_axios@0.18.0@axios/index'
+    import axios from 'axios'
 
     export default {
         name: "ChangePassword",
@@ -72,7 +72,11 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        axios.post('/IGSDN/genUser/updatePassword', this.ruleForm).then((res) => {
+                        let loginName = JSON.parse(localStorage.getItem('user_msg')).id
+                        // let loginName = t_user? t_user:user_msg
+                        let oldPass = this.ruleForm.oldPass
+                        let pass = this.ruleForm.pass
+                        axios.put('/IGSDN/genUser/updatePassword/' + loginName, {oldPass, pass}).then((res) => {
                             if (res.data) {
                                 alert('修改成功!');
                             } else {
