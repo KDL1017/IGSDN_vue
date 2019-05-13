@@ -104,8 +104,6 @@
                             </el-pagination></el-tab-pane>
                     </el-tabs>
                 </div>
-
-
             </div>
         </el-card>
 
@@ -155,6 +153,10 @@
 
     .item {
         margin-bottom: 18px;
+    }
+
+    .clearfix div {
+        margin: 10px;
     }
 
     .clearfix:before,

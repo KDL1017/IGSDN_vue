@@ -25,10 +25,9 @@
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}} <i class="el-icon-caret-bottom"></i>
+                        {{uname}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-
                         <el-dropdown-item divided command="changePassword">修改密码</el-dropdown-item>
                         <el-dropdown-item divided command="userCenter">个人中心</el-dropdown-item>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
@@ -43,18 +42,19 @@
     import bus from '../common/bus';
 
     export default {
+
         data() {
             return {
                 collapse: false,
                 fullscreen: false,
-                name: 'linxin',
+                name: 'test',
                 message: 2
             }
         },
         computed: {
-            username() {
-                let username = localStorage.getItem('ms_username');
-                return username ? username : this.name;
+            uname() {
+                let user_msg = JSON.parse(localStorage.getItem('user_msg'))
+                return user_msg ? user_msg.uname : this.name
             }
         },
         methods: {
