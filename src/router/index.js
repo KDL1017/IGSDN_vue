@@ -48,6 +48,22 @@ export default new Router({
                     meta: {title: '知识分类'}
                 },
                 {
+                    path: 'userUpload',
+                    component: resolve => require(['../components/gen/UserUpLoad.vue'], resolve),
+
+                },
+                {
+                    path: 'memory',
+                    component: resolve => require(['../components/gen/Memory.vue'], resolve),
+
+                },
+                {
+                    path: 'userinformation',
+                    component: resolve => require(['../components/gen/UserInformation.vue'], resolve),
+
+                },
+
+                {
                     path: 'upload',
                     component: resolve => require(['../components/page/Upload.vue'], resolve),
                     meta: {title: '文件上传'}
