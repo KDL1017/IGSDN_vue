@@ -5,10 +5,20 @@ Vue.use(Router);
 
 export default new Router({
     routes: [
-
+        {
+            path: '/documentOnlinePreview',
+            name: "documentOnlinePreview",
+            component: resolve => require(['../components/common/DocumentOnlinePreview.vue'], resolve),
+            meta: {
+                title: 'IGSDN - 在线预览'
+            }
+        },
         {
             path: '/genUserLogin',
-            component: resolve => require(['../components/gen/Login.vue'], resolve)
+            component: resolve => require(['../components/gen/Login.vue'], resolve),
+            meta: {
+                title: 'IGSDN - 用户登陆'
+            }
         },
         {
             path: '/',
@@ -20,27 +30,29 @@ export default new Router({
             children: [
                 {
                     path: '/',
-                    redirect: 'recommendation'
+                    redirect: 'recommendation',
                 },
                 {
                     path: 'changePassword',
-                    component: resolve => require(['../components/gen/ChangePassword.vue'], resolve)
-
+                    component: resolve => require(['../components/gen/ChangePassword.vue'], resolve),
+                    meta: {
+                        title: 'IGSDN - 修改密码'
+                    }
                 },
                 {
                     path: 'userCenter',
-                    component: resolve => require(['../components/gen/UserCenter.vue'], resolve)
-
+                    component: resolve => require(['../components/gen/UserCenter.vue'], resolve),
+                    meta: {title: 'IGSDN - 用户中心'}
                 },
                 {
                     path: 'changePerson',
-                    component: resolve => require(['../components/common/ChangePerson.vue'], resolve)
-
+                    component: resolve => require(['../components/common/ChangePerson.vue'], resolve),
+                    meta: {title: 'IGSDN - 修改个人信息'}
                 },
                 {
                     path: 'recommendation',
                     component: resolve => require(['../components/page/Recommendation.vue'], resolve),
-                    meta: {title: '首页'}
+                    meta: {title: 'IGSDN - 首页'}
                 },
                 {
                     path: 'knowledge-:category',

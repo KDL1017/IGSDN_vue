@@ -67,7 +67,7 @@
             }
         },
         mounted() {
-            localStorage.setItem("userInfo", JSON.stringify(this.userInfo))
+            // localStorage.setItem("userInfo", JSON.stringify(this.userInfo))
             let t_user = localStorage.getItem("t_user")
             let user_msg = JSON.parse(localStorage.getItem('user_msg'))
             let loginName = user_msg.id
@@ -83,6 +83,11 @@
                 localStorage.setItem("userInfo", this.userInfo)
                 this.userInfo.email = this.userInfo.email ? this.userInfo.email : '未绑定'
                 this.userInfo.tel = this.userInfo.tel ? this.userInfo.tel : '未绑定'
+            }).catch(()=>{
+                this.$message({
+                    type: 'error',
+                    message: '修改失败，请检查网络连接!'
+                })
             })
         },
         methods: {

@@ -80,7 +80,7 @@
                             value: 'kekong',
                             label: '可控'
                         }],
-                    },{
+                    }, {
                         value: 'bianchengyuyan',
                         label: '编程语言',
                         children: [{
@@ -95,16 +95,16 @@
                         }, {
                             value: 'Kotlin',
                             label: 'Kotlin'
-                        },{
+                        }, {
                             value: 'Python',
                             label: 'Python'
-                        },{
+                        }, {
                             value: 'JavaScript',
                             label: 'JavaScript'
                         }],
                     }],
 
-                },{
+                }, {
                     value: 'gerenzhishi',
                     label: '个人知识',
                     children: [{
@@ -123,7 +123,7 @@
                             value: 'kekong',
                             label: '可控'
                         }],
-                    },{
+                    }, {
                         value: 'bianchengyuyan',
                         label: '编程语言',
                         children: [{
@@ -138,10 +138,10 @@
                         }, {
                             value: 'Kotlin',
                             label: 'Kotlin'
-                        },{
+                        }, {
                             value: 'Python',
                             label: 'Python'
-                        },{
+                        }, {
                             value: 'JavaScript',
                             label: 'JavaScript'
                         }],
@@ -150,8 +150,6 @@
                 }]
             }
         },
-
-
 
 
         methods: {

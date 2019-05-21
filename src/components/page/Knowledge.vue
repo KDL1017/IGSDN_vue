@@ -1,5 +1,10 @@
 <template>
 
+    <div>
+        {{category}}
+        <OnlinePreviewButton :documentId="documentId" :documentType="documentType"></OnlinePreviewButton>
+    </div>
+
     <div class="file-list">
         <div class="file-item-recommend">
             <!--                            v-for="list in recommendList"  -->
