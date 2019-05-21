@@ -57,7 +57,12 @@ export default new Router({
                 {
                     path: 'knowledge-:category',
                     component: resolve => require(['../components/page/Knowledge.vue'], resolve),
-                    meta: {title: 'IGSDN - 知识分类'}
+                    meta: {title: '知识分类'},
+                },
+                {
+                    path: 'knowledgeDetails',
+                    component: resolve => require(['../components/page/com/KnowledgeDetails.vue'], resolve),
+                    meta: {title: '文档详情'},
                 },
                 {
                     path: 'userUpload',
