@@ -5,6 +5,7 @@ Vue.use(Router);
 
 export default new Router({
     routes: [
+
         {
             path: '/genUserLogin',
             component: resolve => require(['../components/gen/Login.vue'], resolve)
@@ -16,16 +17,30 @@ export default new Router({
         {
             path: '/genUser',
             component: resolve => require(['../components/common/Home.vue'], resolve),
-            meta: {title: '自述文件'},
             children: [
                 {
                     path: '/',
                     redirect: 'recommendation'
                 },
                 {
+                    path: 'changePassword',
+                    component: resolve => require(['../components/gen/ChangePassword.vue'], resolve)
+
+                },
+                {
+                    path: 'userCenter',
+                    component: resolve => require(['../components/gen/UserCenter.vue'], resolve)
+
+                },
+                {
+                    path: 'changePerson',
+                    component: resolve => require(['../components/common/ChangePerson.vue'], resolve)
+
+                },
+                {
                     path: 'recommendation',
                     component: resolve => require(['../components/page/Recommendation.vue'], resolve),
-                    meta: {title: '个性推荐'}
+                    meta: {title: '首页'}
                 },
                 {
                     path: 'knowledge-:category',
@@ -37,6 +52,22 @@ export default new Router({
                     component: resolve => require(['../components/page/com/KnowledgeDetails.vue'], resolve),
                     meta: {title: '文档详情'},
                 },
+                {
+                    path: 'userUpload',
+                    component: resolve => require(['../components/gen/UserUpLoad.vue'], resolve),
+
+                },
+                {
+                    path: 'memory',
+                    component: resolve => require(['../components/gen/Memory.vue'], resolve),
+
+                },
+                {
+                    path: 'userinformation',
+                    component: resolve => require(['../components/gen/UserInformation.vue'], resolve),
+
+                },
+
                 {
                     path: 'upload',
                     component: resolve => require(['../components/page/Upload.vue'], resolve),

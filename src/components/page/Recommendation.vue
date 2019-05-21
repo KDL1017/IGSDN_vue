@@ -1,4 +1,5 @@
 <template>
+
             <div class="filter-list-recommend" ref="list">
                 <el-container>
                     <el-header>Header</el-header>
@@ -23,7 +24,6 @@
                         <el-tab-pane label="热门" name="second">热门</el-tab-pane>
                     </el-tabs>
 <!--                    <Item :recommend-list="recommendList"></Item>-->
-
                 </template>
             </div>
 </template>
@@ -154,7 +154,6 @@
     @import url("../../assets/css/Recommendstyle.css");
     @import url("../../assets/css/tabs.css");
     .el-carousel__item h3 {
-
         color: #475669;
         font-size: 14px;
         opacity: 0.75;
@@ -169,7 +168,6 @@
     .el-carousel__item:nth-child(2n+1) {
         background-color: #d3dce6;
     }
-
     .el-header, .el-footer {
         background-color: #B3C0D1;
         color: #333;

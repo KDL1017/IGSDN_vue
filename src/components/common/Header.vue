@@ -16,7 +16,7 @@
                 <!-- 消息中心 -->
                 <div class="btn-bell">
                     <el-tooltip effect="dark" :content="message?`有${message}条未读消息`:`消息中心`" placement="bottom">
-                        <router-link to="/tabs">
+                        <router-link to="userinformation">
                             <i class="el-icon-bell"></i>
                         </router-link>
                     </el-tooltip>
@@ -25,42 +25,56 @@
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}} <i class="el-icon-caret-bottom"></i>
+                        {{uname}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item divided command="changePassword">修改密码</el-dropdown-item>
+                        <el-dropdown-item divided command="userCenter">个人中心</el-dropdown-item>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
         </div>
     </div>
+
 </template>
 <script>
     import bus from '../common/bus';
 
     export default {
+
         data() {
             return {
                 collapse: false,
                 fullscreen: false,
-                name: 'linxin',
+                name: 'test',
                 message: 2
             }
         },
         computed: {
-            username() {
-                let username = localStorage.getItem('ms_username');
-                return username ? username : this.name;
+            uname() {
+                let user_msg = JSON.parse(localStorage.getItem('user_msg'))
+                return user_msg ? user_msg.uname : this.name
             }
         },
         methods: {
             // 用户名下拉菜单选择事件
             handleCommand(command) {
                 if (command == 'loginout') {
-                    localStorage.removeItem('ms_username')
-                    this.$router.push('/login');
+                    localStorage.removeItem('t_user')
+                    localStorage.removeItem('user_msg')
+                    this.$router.push('/genUserLogin');
                 }
+                if (command == 'changePassword') {
+                    this.$router.push('changePassword');
+                }
+                if (command == 'userCenter') {
+                    this.$router.push('userCenter');
+                }
+
             },
+
+
             // 侧边栏折叠
             collapseChage() {
                 this.collapse = !this.collapse;
