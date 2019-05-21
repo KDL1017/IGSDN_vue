@@ -53,8 +53,9 @@
         },
         computed: {
             uname() {
-                let user_msg = JSON.parse(localStorage.getItem('user_msg'))
-                return user_msg ? user_msg.uname : this.name
+                // let user_msg = JSON.parse(localStorage.getItem('user_msg'))
+                // return user_msg ? user_msg.uname : this.name
+                return this.name
             }
         },
         methods: {

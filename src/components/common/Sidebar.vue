@@ -40,12 +40,12 @@
                 collapse: false,
                 items: [
                     {
-                        icon: 'el-icon-lx-home',
+                        icon: 'el-icon-house',
                         index: 'recommendation',
                         title: '首页'
                     },
                     {
-                        icon: 'el-icon-document',
+                        icon: 'el-icon-reading',
                         index: '2',
                         title: '知识分类',
                         subs: [
@@ -86,7 +86,7 @@
                         ]
                     },
                     {
-                        icon: 'el-icon-reading',
+                        icon: 'el-icon-document',
                         index: '3',
                         title: '个人知识',
                         subs: [

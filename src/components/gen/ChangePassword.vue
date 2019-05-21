@@ -78,10 +78,21 @@
                         let pass = this.ruleForm.pass
                         axios.put('/IGSDN/genUser/updatePassword/' + loginName, {oldPass, pass}).then((res) => {
                             if (res.data) {
-                                alert('修改成功!');
+                                this.$message({
+                                    type: 'success',
+                                    message: '修改成功!'
+                                })
                             } else {
-                                alert('修改失败!');
+                                this.$message({
+                                    type: 'error',
+                                    message: '服务器异常，请稍后再试!'
+                                })
                             }
+                        }).catch(()=>{
+                            this.$message({
+                                type: 'error',
+                                message: '修改失败，请检查网络连接!'
+                            })
                         })
                     } else {
                         console.log('error submit!!');
