@@ -32,7 +32,7 @@
 </template>
 
 <script>
-    import bus from '../common/bus';
+    import bus from '../common/bus'
 
     export default {
         data() {
@@ -46,84 +46,72 @@
                     },
                     {
                         icon: 'el-icon-reading',
-                        index: '2',
-                        title: '知识分类',
+                        index: 'knowledge',
+                        title: '全部知识',
                         subs: [
                             {
-                                index: 'knowledge-base',
-                                title: '计算机基础'
-                            },
-                            {
-                                index: '2-2',
+                                index: 'knowledge-1',
                                 title: '编程语言',
                                 subs: [
                                     {
-                                        index: 'knowledge-pl-C',
-                                        title: 'C'
+                                        index: 'knowledge-1',
+                                        title: '推荐',
                                     },
                                     {
-                                        index: 'knowledge-pl-java',
-                                        title: 'java'
+                                        index: 'knowledge-2',
+                                        title: 'C/C++',
                                     },
                                     {
-                                        index: 'knowledge-pl-C#',
+                                        index: 'knowledge-3',
+                                        title: 'java',
+                                    },
+                                    {
+                                        index: 'knowledge-4',
                                         title: 'C#'
                                     },
                                     {
-                                        index: 'knowledge-pl-Kotlin',
-                                        title: 'Kotlin'
-                                    },
-                                    {
-                                        index: 'knowledge-pl-Python',
-                                        title: 'Python'
-                                    },
-                                    {
-                                        index: 'knowledge-pl-JavaScript',
+                                        index: 'knowledge-5',
                                         title: 'JavaScript'
-                                    }
+                                    },
                                 ]
                             },
+                            {
+                                index: 'knowledge-6',
+                                title: '数据结构',
+                            }
                         ]
                     },
                     {
-                        icon: 'el-icon-document',
-                        index: '3',
+                        icon: 'el-icon-tickets',
+                        index: 'knowledge-private',
                         title: '个人知识',
                         subs: [
                             {
-                                index: 'knowledge-private-base',
-                                title: '计算机基础'
-                            },
-                            {
-                                index: '2-2',
+                                index: 'knowledge-private-1',
                                 title: '编程语言',
                                 subs: [
                                     {
-                                        index: 'knowledge-private-pl-C',
-                                        title: 'C'
+                                        index: 'knowledge-private-2',
+                                        title: 'C/C++',
                                     },
                                     {
-                                        index: 'knowledge-private-pl-java',
-                                        title: 'java'
+                                        index: 'knowledge-private-3',
+                                        title: 'java',
                                     },
                                     {
-                                        index: 'knowledge-private-pl-C#',
+                                        index: 'knowledge-private-4',
                                         title: 'C#'
                                     },
                                     {
-                                        index: 'knowledge-private-pl-Kotlin',
-                                        title: 'Kotlin'
-                                    },
-                                    {
-                                        index: 'knowledge-private-pl-Python',
-                                        title: 'Python'
-                                    },
-                                    {
-                                        index: 'knowledge-private-pl-JavaScript',
+                                        index: 'knowledge-private-5',
                                         title: 'JavaScript'
-                                    }
+                                    },
                                 ]
                             },
+                            {
+                                index: 'knowledge-private-6',
+                                title: '数据结构',
+                            }
                         ]
                     },
                     {

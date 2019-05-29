@@ -8,7 +8,7 @@ export default new Router({
         {
             path: '/documentOnlinePreview',
             name: "documentOnlinePreview",
-            component: resolve => require(['../components/common/DocumentOnlinePreview.vue'], resolve),
+            component: resolve => require(['../components/page/DocumentOnlinePreview.vue'], resolve),
             meta: {
                 title: 'IGSDN - 在线预览'
             }
@@ -35,9 +35,7 @@ export default new Router({
                 {
                     path: 'changePassword',
                     component: resolve => require(['../components/gen/ChangePassword.vue'], resolve),
-                    meta: {
-                        title: 'IGSDN - 修改密码'
-                    }
+                    meta: {title: 'IGSDN - 修改密码'}
                 },
                 {
                     path: 'userCenter',
@@ -46,7 +44,7 @@ export default new Router({
                 },
                 {
                     path: 'changePerson',
-                    component: resolve => require(['../components/common/ChangePerson.vue'], resolve),
+                    component: resolve => require(['../components/page/ChangePerson.vue'], resolve),
                     meta: {title: 'IGSDN - 修改个人信息'}
                 },
                 {
@@ -57,33 +55,23 @@ export default new Router({
                 {
                     path: 'knowledge-:category',
                     component: resolve => require(['../components/page/Knowledge.vue'], resolve),
-                    meta: {title: '知识分类'},
+                    meta: {title: '文档管理'},
                 },
                 {
-                    path: 'knowledgeDetails',
-                    component: resolve => require(['../components/page/com/KnowledgeDetails.vue'], resolve),
+                    name: 'documentDetails',
+                    path: 'documentDetails',
+                    component: resolve => require(['../components/page/DocumentDetails.vue'], resolve),
                     meta: {title: '文档详情'},
                 },
                 {
-                    path: 'userUpload',
-                    component: resolve => require(['../components/gen/UserUpLoad.vue'], resolve),
-
+                    name: 'MarkdownEditor',
+                    path: 'MarkdownEditor',
+                    component: resolve => require(['../components/page/MarkdownEditor.vue'], resolve),
+                    meta: {title: '在线编辑'},
                 },
                 {
                     path: 'memory',
                     component: resolve => require(['../components/gen/Memory.vue'], resolve),
-
-                },
-                {
-                    path: 'userinformation',
-                    component: resolve => require(['../components/gen/UserInformation.vue'], resolve),
-
-                },
-
-                {
-                    path: 'upload',
-                    component: resolve => require(['../components/page/Upload.vue'], resolve),
-                    meta: {title: '文件上传'}
                 },
                 {
                     path: '*',
