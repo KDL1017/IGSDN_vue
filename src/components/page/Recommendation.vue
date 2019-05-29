@@ -1,31 +1,34 @@
 <template>
-    <div style="margin: 0 auto">
-        <el-container>
+    <div>
+        <!--头部标签-->
+        <div style="margin: 0 auto">
             <el-container>
-                <el-header>Header</el-header>
-                <el-main>
-                    <el-carousel style="width: 60%;margin:2px">
-                        <el-carousel-item v-for="item in 4" :key="item">
-                            <h3 class="small">{{ item }}</h3>
-                        </el-carousel-item>
-                    </el-carousel>
-                    <div style="height:200px;background-color:red">
-                    </div>
-                </el-main>
+                <el-container>
+                    <el-header>Header</el-header>
+                    <el-main>
+                        <el-carousel style="width: 60%;margin:2px">
+                            <el-carousel-item v-for="item in 4" :key="item">
+                                <h3 class="small">{{ item }}</h3>
+                            </el-carousel-item>
+                        </el-carousel>
+                        <div style="height:200px;background-color:red">
+                        </div>
+                    </el-main>
+                </el-container>
             </el-container>
-        </el-container>
+        </div>
+
+
+
+
+
+
+
     </div>
 </template>
 
 <script>
-    export default {
-        name: "Recommendation",
-        data() {
-            return {
-                activeName: '1'
-            };
-        }
-    }
+
 </script>
 
 <style scoped>

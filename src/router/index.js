@@ -38,6 +38,11 @@ export default new Router({
 
                 },
                 {
+                    path: 'documentComments',
+                    component: resolve => require(['../components/page/DocumentComments.vue'], resolve)
+
+                },
+                {
                     path: 'recommendation',
                     component: resolve => require(['../components/page/Recommendation.vue'], resolve),
                     meta: {title: '首页'}
@@ -48,17 +53,12 @@ export default new Router({
                     meta: {title: '知识分类'}
                 },
                 {
-                    path: 'userUpload',
-                    component: resolve => require(['../components/gen/UserUpLoad.vue'], resolve),
-
-                },
-                {
                     path: 'memory',
                     component: resolve => require(['../components/gen/Memory.vue'], resolve),
 
                 },
                 {
-                    path: 'userinformation',
+                    path: 'userInformation',
                     component: resolve => require(['../components/gen/UserInformation.vue'], resolve),
 
                 },
