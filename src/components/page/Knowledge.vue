@@ -63,9 +63,6 @@
             },
             receiveChildMsg(loadingFlag) {
                 this.$emit("loadingFlag", loadingFlag)
-            }
-        }
-
     }
 </script>
 

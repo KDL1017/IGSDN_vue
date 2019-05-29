@@ -1,4 +1,4 @@
-import Vue from 'vue';
+﻿import Vue from 'vue';
 import Router from 'vue-router';
 
 Vue.use(Router);
@@ -46,6 +46,11 @@ export default new Router({
                     path: 'changePerson',
                     component: resolve => require(['../components/page/ChangePerson.vue'], resolve),
                     meta: {title: 'IGSDN - 修改个人信息'}
+                },
+                {
+                    path: 'documentComments',
+                    component: resolve => require(['../components/page/DocumentComments.vue'], resolve)
+
                 },
                 {
                     path: 'recommendation',

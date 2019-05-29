@@ -1,40 +1,22 @@
 <template>
     <div class="sidebar">
+        <!-- 前台遍历是自己循环-->
         <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="white"
                  text-color="black" active-text-color="#00d1b2" unique-opened router>
-            <template v-for="item in items">
-                <template v-if="item.subs">
-                    <el-submenu :index="item.index" :key="item.index">
-                        <template slot="title">
-                            <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
-                        </template>
-                        <template v-for="subItem in item.subs">
-                            <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
-                                <template slot="title">{{ subItem.title }}</template>
-                                <el-menu-item v-for="(threeItem,i) in subItem.subs" :key="i" :index="threeItem.index">
-                                    {{ threeItem.title }}
-                                </el-menu-item>
-                            </el-submenu>
-                            <el-menu-item v-else :index="subItem.index" :key="subItem.index">
-                                {{ subItem.title }}
-                            </el-menu-item>
-                        </template>
-                    </el-submenu>
-                </template>
-                <template v-else>
-                    <el-menu-item :index="item.index" :key="item.index">
-                        <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
-                    </el-menu-item>
-                </template>
-            </template>
+            <SiderBarTree :items="items"></SiderBarTree>
+
         </el-menu>
     </div>
 </template>
 
 <script>
+    import SiderBarTree from './SidebarTree'
     import bus from '../common/bus'
-
+    import axios from 'axios'
     export default {
+        components:{
+            SiderBarTree
+        },
         data() {
             return {
                 collapse: false,
@@ -45,10 +27,16 @@
                         title: '首页'
                     },
                     {
-                        icon: 'el-icon-reading',
-                        index: 'knowledge',
+                        icon: 'el-icon-lx-home',
+                        index: 'documentComments',
+                        title: '文件评论'
+                    },
+                    {
+                        icon: 'el-icon-document',
+                        index: '2',
                         title: '全部知识',
-                        subs: [
+                        subs: [],
+                        /*[
                             {
                                 index: 'knowledge-1',
                                 title: '编程语言',
@@ -75,19 +63,20 @@
                                     },
                                 ]
                             },
-                            {
-                                index: 'knowledge-6',
-                                title: '数据结构',
-                            }
-                        ]
+                        ]*/
+
                     },
                     {
                         icon: 'el-icon-tickets',
                         index: 'knowledge-private',
                         title: '个人知识',
-                        subs: [
+                        subs: []
+                           /* {
+                                index: 'knowledge-private-base',
+                                title: '计算机基础'
+                            },
                             {
-                                index: 'knowledge-private-1',
+                                index: '2-2',
                                 title: '编程语言',
                                 subs: [
                                     {
@@ -108,11 +97,7 @@
                                     },
                                 ]
                             },
-                            {
-                                index: 'knowledge-private-6',
-                                title: '数据结构',
-                            }
-                        ]
+                        ]*/
                     },
                     {
                         icon: 'el-icon-upload2',
@@ -121,6 +106,25 @@
                     },
                 ]
             }
+        },
+        mounted() {
+            axios.get("/IGSDN/listSimpleCategories").then((res) => {
+               // console.log(res.data)
+                let i = 0
+               //console.log(res.data.children)
+
+
+
+
+                this.items[2].subs = res.data[0].subs
+                this.items[3].subs = res.data[1].subs
+                //console.log(this.items)
+                //console.log(this.items[2].subs[0].node.index)
+                //console.log(this.items)
+
+            }).catch((e) => {
+
+            })
         },
         computed: {
             onRoutes() {
