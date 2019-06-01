@@ -9,6 +9,7 @@ import './assets/css/icon.css';
 import './components/common/directives';
 import "babel-polyfill";
 
+axios.defaults.baseURL = "http://localhost:8080/"
 Vue.config.productionTip = false
 Vue.use(ElementUI, {
     size: 'small'
@@ -16,23 +17,23 @@ Vue.use(ElementUI, {
 Vue.prototype.$axios = axios;
 
 // 使用钩子函数对路由进行权限跳转
-// router.beforeEach((to, from, next) => {
-//     const role = localStorage.getItem('t_user')
-//     if (!role && to.path !== '/genUserLogin') { // 未登录
-//         next('/genUserLogin')
-//     } else if (to.meta.permission) {
-//         if (role === 'gen')
-//             next('/genUser')
-//         else if (role === 'admin')
-//             next('/admin')
-//         else
-//             next('/genUserLogin')
-//     } else {
-//         next()
-//     }
-// })
 router.beforeEach((to, from, next) => {
-    if(to.meta.title) {
+    const role = localStorage.getItem('t_user')
+    if (!role && to.path !== '/genUserLogin') { // 未登录
+        next('/genUserLogin')
+    } else if (to.meta.permission) {
+        if (role === 'gen')
+            next('/genUser')
+        else if (role === 'admin')
+            next('/admin')
+        else
+            next('/genUserLogin')
+    } else {
+        next()
+    }
+})
+router.beforeEach((to, from, next) => {
+    if (to.meta.title) {
         document.title = to.meta.title
         next()
     }

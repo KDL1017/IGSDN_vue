@@ -3,6 +3,7 @@
         <el-card class="box-card">
             <div slot="header" class="clearfix">
                 <span>修改用户信息</span>
+                <el-button style="float: right; padding: 2px 0" type="text" @click="goBack">返回</el-button>
             </div>
             <el-form :model="personValidateForm" ref="personValidateForm" label-width="100px" class="demo-ruleForm">
                 <el-form-item label="真实姓名" prop="name" :rules="[ { required: true, message: '真实姓名不能为空'}]">
@@ -23,7 +24,6 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="submitForm('personValidateForm')">提交信息</el-button>
-                    <el-button type="danger" @click="resetForm('personValidateForm')">重置信息</el-button>
                     <el-button @click="goBack">返回上级</el-button>
                 </el-form-item>
             </el-form>
@@ -38,11 +38,19 @@
     export default {
         name: "ChangePerson",
         mounted() {
-            let userInfo = JSON.parse(localStorage.getItem("userInfo"))
-            this.personValidateForm.uname = userInfo.uname
-            this.personValidateForm.name = userInfo.name
-            this.personValidateForm.gender = userInfo.gender
-            this.personValidateForm.age = parseInt(userInfo.age)
+            const userId = JSON.parse(localStorage.getItem('user_msg')).id
+            // let loginName = t_user? t_user:user_msg
+            axios.get('/IGSDN/genUser/selectUserInfo/' + userId).then((res) => {
+                this.personValidateForm.name = res.data.name
+                this.personValidateForm.uname = res.data.uname
+                this.personValidateForm.age = parseInt(res.data.age)
+                this.personValidateForm.gender = res.data.gender ? "男" : "女"
+            }).catch(() => {
+                this.$message({
+                    type: 'error',
+                    message: '修改失败，请检查网络连接!'
+                })
+            })
         },
         data() {
             return {
@@ -55,6 +63,9 @@
             };
         },
         methods: {
+            goBack() {
+                this.$router.go(-1);
+            },
             submitForm(formName) {
                 let personValidateForm = this.personValidateForm
                 this.$refs[formName].validate((valid) => {
@@ -87,9 +98,6 @@
                         return false;
                     }
                 });
-            },
-            resetForm(formName) {
-                this.$refs[formName].resetFields();
             },
             goBack() {
                 this.$router.go(-1);

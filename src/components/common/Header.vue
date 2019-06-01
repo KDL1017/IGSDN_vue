@@ -28,8 +28,8 @@
                         {{uname}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item divided command="changePassword">修改密码</el-dropdown-item>
                         <el-dropdown-item divided command="userCenter">个人中心</el-dropdown-item>
+                        <el-dropdown-item divided command="changePassword">修改密码</el-dropdown-item>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -47,15 +47,8 @@
             return {
                 collapse: false,
                 fullscreen: false,
-                name: 'test',
+                uname: '',
                 message: 2
-            }
-        },
-        computed: {
-            uname() {
-                // let user_msg = JSON.parse(localStorage.getItem('user_msg'))
-                // return user_msg ? user_msg.uname : this.name
-                return this.name
             }
         },
         methods: {
@@ -110,6 +103,7 @@
             }
         },
         mounted() {
+            this.uname = JSON.parse(localStorage.getItem('user_msg')).uname
             if (document.body.clientWidth < 1500) {
                 this.collapseChage();
             }

@@ -18,7 +18,7 @@
                         {{userInfo.tel?userInfo.tel:'未绑定'}}
                     </td>
                     <td>
-                        <el-button type="primary" icon="el-icon-edit" size="mini" circle
+                        <el-button type="primary" :icon="userInfo.tel?'el-icon-edit':'el-icon-plus'" size="mini" circle
                                    @click="bindingUserLoginName('tel')"></el-button>
                     </td>
                 </tr>
@@ -28,7 +28,8 @@
                         {{userInfo.email?userInfo.email:'未绑定'}}
                     </td>
                     <td>
-                        <el-button type="primary" icon="el-icon-plus" size="mini" circle
+                        <el-button type="primary" :icon="userInfo.email?'el-icon-edit':'el-icon-plus'" size="mini"
+                                   circle
                                    @click="bindingUserLoginName('email')"></el-button>
                     </td>
                 </tr>
@@ -42,7 +43,7 @@
                 </tr>
                 <tr>
                     <td>性别：</td>
-                    <td>{{userInfo.gender}}</td>
+                    <td>{{userInfo.gender?"男":"女"}}</td>
                 </tr>
             </table>
         </el-card>
@@ -67,23 +68,16 @@
             }
         },
         mounted() {
-            // localStorage.setItem("userInfo", JSON.stringify(this.userInfo))
-            let t_user = localStorage.getItem("t_user")
-            let user_msg = JSON.parse(localStorage.getItem('user_msg'))
-            let loginName = user_msg.id
+            const userId = JSON.parse(localStorage.getItem('user_msg')).id
             // let loginName = t_user? t_user:user_msg
-            axios.get('/IGSDN/genUser/selectUserInfo/' + loginName).then((res) => {
-                console.log(res.data)
+            axios.get('/IGSDN/genUser/selectUserInfo/' + userId).then((res) => {
                 this.userInfo.name = res.data.name
                 this.userInfo.uname = res.data.uname
                 this.userInfo.age = res.data.age
                 this.userInfo.gender = res.data.gender
                 this.userInfo.email = res.data.email
                 this.userInfo.tel = res.data.tel
-                localStorage.setItem("userInfo", this.userInfo)
-                this.userInfo.email = this.userInfo.email ? this.userInfo.email : '未绑定'
-                this.userInfo.tel = this.userInfo.tel ? this.userInfo.tel : '未绑定'
-            }).catch(()=>{
+            }).catch(() => {
                 this.$message({
                     type: 'error',
                     message: '修改失败，请检查网络连接!'

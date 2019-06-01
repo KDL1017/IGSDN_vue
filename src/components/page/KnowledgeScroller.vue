@@ -10,7 +10,7 @@
                 </div>
             </transition>
             <el-card style="min-width: 600px">
-                <KnowledgeItem v-for="document in documentList" :document="document" :key="document.id"
+                <KnowledgeItem v-for="document in documentList" :document="document"
                                :isPrivate="false"
                                style="margin: 0 20px 20px 0;width: auto;display:inline-block !important; display:inline;"/>
                 <div style="width: 100%;text-align: center;margin: 10px;color: #909399" :style="msgStyle"
@@ -48,8 +48,9 @@
                 documentList: [],
             }
         },
-        created() {
-            this.userId = localStorage.getItem("user_msg") ? localStorage.getItem("user_msg").id : 2
+        mounted() {
+            this.userId = JSON.parse(localStorage.getItem("user_msg")).id
+            this.init()
         },
         watch: {
             isScrolling() {
@@ -100,7 +101,7 @@
                     userId,
                     categoryId,
                     currentPage,
-                    pageSize
+                    pageSize,
                 }).then((res) => {
                     this.success = true
                     this.documentList = this.documentList.concat(res.data)

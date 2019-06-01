@@ -53,24 +53,13 @@
             mavonEditor
         },
         mounted() {
-            const documentId = this.$route.params.documentId
+            const documentId = this.$route.query.documentId
             if (documentId) {
                 this.documentId = documentId
                 this.isContentLoading = true
                 this.isUpdateLoading = false
                 this.init()
             }
-        },
-        watch: {
-            $route() {
-                const documentId = this.$route.params.documentId
-                if (documentId) {
-                    this.documentId = documentId
-                    this.isContentLoading = true
-                    this.isUpdateLoading = false
-                    this.init()
-                }
-            },
         },
         computed: {
             submitButtonText() {
@@ -97,6 +86,7 @@
             //     })
             // },
             init() {
+                this.content = ''
                 if (this.documentId && this.documentId != 0) {
                     axios.get('/IGSDN/getMarkdownContent/' + this.documentId).then((res) => {
                         this.content = res.data
@@ -130,8 +120,9 @@
                     })
                 }
                 return
-            }
-        }
+            },
+        },
+
     }
 </script>
 <style scoped>

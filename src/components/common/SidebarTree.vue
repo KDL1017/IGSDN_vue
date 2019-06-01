@@ -1,25 +1,17 @@
 <template>
-    <div >
-        <template v-for="item in items" >
-            <template v-if="item.subs">
-                <el-submenu :index="item.index" :key="item.index" unique-opened router>
-                    <template slot="title">
-                        <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
-                    </template>
-                  <!-- <el-menu-item :index="item.index" :key="item.index">
-                        <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
-                    </el-menu-item>-->
-                    <SiderBarTree :items="item.subs"></SiderBarTree>
-
-
-                </el-submenu>
-            </template>
-            <template v-else>
-                <el-menu-item :index="item.index" :key="item.index" unique-opened router>
+    <div>
+        <div v-for="item in items">
+            <el-submenu v-if="item.subs && item.subs.length!=0" :index="item.index" :key="item.index" unique-opened
+                        router>
+                <template slot="title">
                     <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
-                </el-menu-item>
-            </template>
-        </template>
+                </template>
+                <SidebarTree :items="item.subs"></SidebarTree>
+            </el-submenu>
+            <el-menu-item v-else :index="item.index" :key="item.index" unique-opened router>
+                <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
+            </el-menu-item>
+        </div>
     </div>
 </template>
 

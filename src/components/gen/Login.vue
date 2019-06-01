@@ -95,26 +95,27 @@
             },
             checkLogin() {
                 this.$router.push("/genUser")
-                // const {loginName, password} = this
-                // if (loginName && password) {
-                //     this.isLoading = true
-                //     axios.post('/IGSDN/genUser/checkLogin', {loginName, password}).then((res) => {
-                //         this.isLoading = false
-                //         if (res.data) {
-                //             this.msg = ''
-                //             localStorage.setItem("t_user", "gen")
-                //             localStorage.setItem("user_msg", JSON.stringify(res.data))
-                //             this.$router.push("/")
-                //         } else {
-                //             this.msg = '用户名或密码错误！'
-                //         }
-                //     }).catch((err) => {
-                //         this.isLoading = false
-                //         this.msg = '服务器请求超时，请检查网络连接！'
-                //     })
-                // } else {
-                //     this.msg = '用户名或密码不能为空！'
-                // }
+                const {loginName, password} = this
+                if (loginName && password) {
+                    this.isLoading = true
+                    axios.post('/IGSDN/genUser/checkLogin', {loginName, password}).then((res) => {
+                        this.isLoading = false
+                        if (res.data) {
+                            this.msg = ''
+                            localStorage.setItem("t_user", "gen")
+                            localStorage.setItem("user_msg", JSON.stringify(res.data))
+                            console.log(res.data)
+                            this.$router.push("/")
+                        } else {
+                            this.msg = '用户名或密码错误！'
+                        }
+                    }).catch((err) => {
+                        this.isLoading = false
+                        this.msg = '服务器请求超时，请检查网络连接！'
+                    })
+                } else {
+                    this.msg = '用户名或密码不能为空！'
+                }
             }
         }
     }

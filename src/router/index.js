@@ -6,12 +6,16 @@ Vue.use(Router);
 export default new Router({
     routes: [
         {
-            path: '/documentOnlinePreview',
             name: "documentOnlinePreview",
+            path: '/documentOnlinePreview',
             component: resolve => require(['../components/page/DocumentOnlinePreview.vue'], resolve),
-            meta: {
-                title: 'IGSDN - 在线预览'
-            }
+            meta: {title: 'IGSDN - 在线预览'}
+        },
+        {
+            name: 'MarkdownEditor',
+            path: '/MarkdownEditor',
+            component: resolve => require(['../components/page/MarkdownEditor.vue'], resolve),
+            meta: {title: 'IGSDN - Markdown在线编辑'},
         },
         {
             path: '/genUserLogin',
@@ -21,7 +25,7 @@ export default new Router({
             }
         },
         {
-            path: '/',
+            path: '*',
             redirect: 'genUser'
         },
         {
@@ -31,6 +35,11 @@ export default new Router({
                 {
                     path: '/',
                     redirect: 'recommendation',
+                },
+                {
+                    path: 'recommendation',
+                    component: resolve => require(['../components/page/Recommendation.vue'], resolve),
+                    meta: {title: 'IGSDN - 个人首页'}
                 },
                 {
                     path: 'changePassword',
@@ -47,53 +56,30 @@ export default new Router({
                     component: resolve => require(['../components/page/ChangePerson.vue'], resolve),
                     meta: {title: 'IGSDN - 修改个人信息'}
                 },
-                {
-                    path: 'documentComments',
-                    component: resolve => require(['../components/page/DocumentComments.vue'], resolve)
 
-                },
-                {
-                    path: 'recommendation',
-                    component: resolve => require(['../components/page/Recommendation.vue'], resolve),
-                    meta: {title: 'IGSDN - 首页'}
-                },
                 {
                     path: 'knowledge-:category',
                     component: resolve => require(['../components/page/Knowledge.vue'], resolve),
-                    meta: {title: '文档管理'},
+                    meta: {title: 'IGSDN - 文档管理'},
                 },
                 {
                     name: 'documentDetails',
                     path: 'documentDetails',
                     component: resolve => require(['../components/page/DocumentDetails.vue'], resolve),
-                    meta: {title: '文档详情'},
+                    meta: {title: 'IGSDN - 文档详情'},
                 },
                 {
-                    name: 'MarkdownEditor',
-                    path: 'MarkdownEditor',
-                    component: resolve => require(['../components/page/MarkdownEditor.vue'], resolve),
-                    meta: {title: '在线编辑'},
-                },
-                {
-                    path: 'memory',
-                    component: resolve => require(['../components/gen/Memory.vue'], resolve),
+                    path: 'userInformation',
+                    component: resolve => require(['../components/gen/UserInformation.vue'], resolve),
+                    meta: {title: 'IGSDN - 用户消息'},
                 },
                 {
                     path: '*',
-                    redirect: '404'
-                },
-                {
-                    path: '404',
                     component: resolve => require(['../components/page/404.vue'], resolve),
                     meta: {title: '404'}
                 },
-            ]
-        },
 
-        {
-            path: '*',
-            component: resolve => require(['../components/page/404.vue'], resolve),
-            meta: {title: '404'}
-        }
+            ],
+        },
     ]
 })

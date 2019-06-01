@@ -5,8 +5,10 @@
                 <img :src="icon?icon:''">
             </div>
             <div style="width: auto; float: left;">
-                <div class="title">
-                    <a @click="openDocumentDetails" v-html="document.name"></a>
+                <div>
+                    <a class="title" @click="openDocumentDetails" v-html="document.name"></a>
+                    <el-tag v-if="isPrivate && isPublic">公有</el-tag>
+                    <el-tag type="danger" v-if="isPrivate && !isPublic">私有</el-tag>
                 </div>
                 <div style="float:right;" v-if="isPrivate">
                     <el-button size="mini" plain>编辑</el-button>
@@ -28,7 +30,7 @@
     import axios from 'axios'
 
     export default {
-        props: ['document', 'isPrivate'],
+        props: ['document', 'isPrivate', 'isPublic'],
         data() {
             return {
                 icon: '',

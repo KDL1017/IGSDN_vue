@@ -1,11 +1,14 @@
 <template>
     <div>
         <div style="position: absolute; left: 50%;top: 50%" v-loading="isLoadingDocumentDetails"></div>
-        <transition name="el-zoom-in-center">
-            <el-card v-show="isShow" class="card">
+        <transition name="el-zoom-in-center" mode="out-in">
+            <el-card v-if="!isLoadingDocumentDetails&&isShowDocumentDetails" key="showDocumentDetails" class="card">
                 <div slot="header" class="clearfix" style="text-align: center">
-                    <div style="float:left; font-size: 14px; cursor: pointer" @click="goBack">
+                    <div class="handle" style="float:left;" @click="goBack">
                         <i class="el-icon-arrow-left"></i>&nbsp;返回上级
+                    </div>
+                    <div class="handle" style="float:right;" @click="handleDetailsOrComments">
+                        查看评论<i class="el-icon-arrow-right"></i>&nbsp;
                     </div>
                     <span>{{document.name}}</span>
                 </div>
@@ -53,9 +56,11 @@
                         </tr>
                         <tr style="height: 40px">
                             <td colspan="2" class="left" style="width: auto">
-                                <el-tag type="success" style="margin-right: 14px" v-if="document.key1">{{document.key1}}
+                                <el-tag type="success" style="margin-right: 14px" v-if="document.key1">
+                                    {{document.key1}}
                                 </el-tag>
-                                <el-tag type="warning" style="margin-right: 14px" v-if="document.key2">{{document.key2}}
+                                <el-tag type="warning" style="margin-right: 14px" v-if="document.key2">
+                                    {{document.key2}}
                                 </el-tag>
                                 <el-tag type="danger" v-if="document.key3">{{document.key3}}</el-tag>
                             </td>
@@ -65,6 +70,54 @@
                     <OnlinePreviewButton :isPrivate="isPrivate" :documentId="document.id"
                                          :formatName="document.formatName"></OnlinePreviewButton>
                 </div>
+
+            </el-card>
+            <!--            <DocumentComments v-if="!isLoadingDocumentDetails&&!isShowDocumentDetails">-->
+
+            <!--            </DocumentComments>-->
+            <el-card class="card" v-if="!isLoadingDocumentDetails&&!isShowDocumentDetails" key="showDocumentComments">
+                <div slot="header" class="clearfix" style="text-align: center">
+                    <div class="handle" style="float:left;" @click="handleDetailsOrComments">
+                        <i class="el-icon-arrow-left">查看文件</i>&nbsp;
+                    </div>
+                    <span>文件评论</span>
+                </div>
+                <div style="text-align: center;margin: 50px;color:#909399;"
+                     v-if="!firstLevel || firstLevel.length==0">
+                    该文件暂无评论
+                </div>
+                <div v-else>
+                    <div v-for="(item,index)  in firstLevel"
+                         style="border-bottom: 1px dashed #e0e0e0;padding: 5px 5px 5px 0">
+                        <DocumentCommentsItem :item="item" :documentId="document.id" :userId="userId"
+                                              :isFirstLevel="true" @openMsg="receiveOpenMsg"
+                                              :index="index"></DocumentCommentsItem>
+                        <DocumentCommentsTree v-show="item.data.levelShow"
+                                              :comments="item.children"
+                                              :documentId="document.id"
+                                              :userId="userId"></DocumentCommentsTree>
+                    </div>
+                    <div style="margin: 10px 0" v-show="documentComment.total > pageSize">
+                        <el-pagination
+                                @current-change="handleCurrentChange"
+                                :current-page.sync="documentComment.currentPage"
+                                :page-size="pageSize"
+                                layout="total, prev, pager, next"
+                                :total="documentComment.total">
+                        </el-pagination>
+                    </div>
+                </div>
+                <div style="float: bottom;margin-top: 36px">
+                    <el-input
+                            type="textarea"
+                            :autosize="{ minRows: 2, maxRows: 4}"
+                            placeholder="必须少于50个字符！"
+                            maxlength="50"
+                            v-model="remark_document" style="margin: 5px 0">
+                    </el-input>
+                    <el-checkbox v-model="isIdentify" style="margin: 5px 0">匿名</el-checkbox>
+                    <el-button style="float: right" type="info" @click="replayDocument">发布评论</el-button>
+                </div>
             </el-card>
         </transition>
     </div>
@@ -73,21 +126,25 @@
     import 'element-ui/lib/theme-chalk/base.css'
     import OnlinePreviewButton from './OnlinePreviewButton'
     import axios from 'axios'
+    import DocumentCommentsTree from './DocumentCommentsTree'
+    import DocumentCommentsItem from './DocumentCommentsItem'
 
     export default {
         components: {
-            OnlinePreviewButton
+            OnlinePreviewButton,
+            DocumentCommentsTree,
+            DocumentCommentsItem
         },
         data() {
             return {
                 isPrivate: false,
-                isShow: false,
+                isShowDocumentDetails: true,
                 isLoadingDocumentDetails: true,
                 isShowAllIntro: false,
                 introFlag: true,
                 document: {},
                 documentInit: {
-                    id: 1,
+                    id: 0,
                     name: '',
                     size: '',
                     uploadTime: '',
@@ -101,7 +158,21 @@
                     uploaderName: '',
                     intro: '',
                     downloadNum: 0
-                }
+                },
+                remark_document: '',
+                isIdentify: false,
+                userId: 0,
+                message: '',
+                ///totalNum:9,
+                pageSize: 20,
+                isShow: false,
+                current: 1,
+                activeName: '1',
+                firstLevel: [],
+                documentComment: {},
+                isShowInput: false,
+                content: '',
+                isShowOperation: false,
             }
         },
         methods: {
@@ -109,35 +180,105 @@
                 this.$router.go(-1)
             },
             getDocumentDetails() {
-                this.isLoadingDocumentDetails = true
-                axios.get('/IGSDN/getDocumentDetails/' + this.document.id).then((res) => {
-                    this.isShow = true
-                    this.document = res.data
-                    if (this.document.icon)
-                        this.document.icon = "data:image/jpg;base64," + this.document.icon
-                    else
-                        this.document.icon = localStorage.getItem("icon-" + this.document.formatId)
-                    this.isLoadingDocumentDetails = false
-                }).catch((err) => {
-                    this.isLoadingDocumentDetails = false
-                    console.log(err)
+                const documentId = this.document.id
+                if (documentId && documentId != 0) {
+                    this.isLoadingDocumentDetails = true
+                    axios.get('/IGSDN/getDocumentDetails/' + documentId).then((res) => {
+                        this.isShowDocumentDetails = true
+                        this.document = res.data
+                        if (this.document.icon)
+                            this.document.icon = "data:image/jpg;base64," + this.document.icon
+                        else
+                            this.document.icon = localStorage.getItem("icon-" + this.document.formatId)
+                        this.isLoadingDocumentDetails = false
+                    }).catch((err) => {
+                        this.isLoadingDocumentDetails = false
+                        console.log(err)
+                    })
+                }
+            },
+            handleDetailsOrComments() {
+                this.isShowDocumentDetails = !this.isShowDocumentDetails
+            },
+
+            handleCurrentChange(val) {
+                this.selectDocumentCommentByPageNum(val)
+            },
+            selectDocumentCommentByPageNum(value) {
+                let documentId = this.document.id
+                if (documentId && documentId != 0) {
+                    // let userId = this.userId
+                    let pageNum = value
+                    axios.post('/IGSDN/listDocumentComments', {documentId, pageNum}).then((res) => {
+                        this.documentComment = res.data
+                        this.firstLevel = this.documentComment.data
+                    }).catch((err) => {
+                        this.isLoading = false
+                        this.msg = '服务器请求超时，请检查网络连接！'
+                    })
+                }
+            },
+            replyComments(id) {
+                let documentComment2 = {};
+                documentComment2.isSecond = true
+                documentComment2.document = this.document.id
+                documentComment2.commentId = id
+                documentComment2.content = this.message
+                documentComment2.commentator = this.userID
+                documentComment2.remarkDate = moment().utc().format('YYYY-MM-DD')
+                documentComment2.isIdentify = this.isIdentify
+                documentComment2.id = null
+                axios.post("/IGSDN/replyDocumentComments", {'documentComment2': JSON.stringify(documentComment2)}).then((res) => {
+                    if (res.data) {
+                        alert("评论成功")
+                    } else {
+                        alert("评论失败")
+                    }
+                }).catch(error => {
+
                 })
             },
+            replayDocument() {
+                let documentComment = {};
+                documentComment.document = this.document.id
+                documentComment.content = this.remark_document
+                documentComment.commentator = this.userID
+                documentComment.remarkDate = moment().utc().format('YYYY-MM-DD')
+                documentComment.isIdentify = this.isIdentify
+                documentComment.id = null
+                axios.post("/IGSDN/remarkDocument", {'document': JSON.stringify(documentComment)}).then((res) => {
+                    if (res.data) {
+                        alert("评论成功")
+                    } else {
+                        alert("评论失败")
+                    }
+                }).catch(e => {
+
+                })
+            },
+            receiveOpenMsg(data) {
+                let index = data[0]
+                let isOpen = data[1]
+                this.firstLevel[index].data.levelShow = isOpen
+            }
         },
         created() {
-            this.isShow = false
+            this.isShowDocumentDetails = true
             this.document = this.documentInit
             this.document.id = this.$route.params.documentId
             this.isPrivate = this.$route.params.isPrivate
+            this.userId = localStorage.getItem("user_msg") ? localStorage.getItem("user_msg").id : 2
+            this.selectDocumentCommentByPageNum(1)
             this.getDocumentDetails()
         },
         watch: {
             $route() {
-                this.isShow = false
+                this.isShowDocumentDetails = true
                 this.document = this.documentInit
                 this.document.id = this.$route.params.documentId
                 this.isPrivate = this.$route.params.isPrivate
                 this.getDocumentDetails()
+                this.selectDocumentCommentByPageNum(1)
             },
         },
         computed: {
@@ -145,8 +286,10 @@
                 if (this.isShowAllIntro)
                     return this.document.intro
                 let intro = this.document.intro
-                this.introFlag = intro.length > 160
-                intro = this.introFlag ? intro.substring(0, 160) + "..." : intro
+                if (intro) {
+                    this.introFlag = intro.length > 160
+                    intro = this.introFlag ? intro.substring(0, 160) + "..." : intro
+                }
                 return intro
             }
             ,
@@ -186,9 +329,8 @@
     }
 
     .card {
-        min-height: 380px;
         width: 700px;
-        margin: 20px auto;
+        margin: 20px auto 0 auto;
         padding: 10px
     }
 
@@ -220,5 +362,28 @@
     .more:hover {
         color: #E6A23C;
         text-decoration: underline;
+    }
+
+    .handle {
+        font-size: 14px;
+        cursor: pointer
+    }
+
+    a {
+        font-size: 12px;
+        color: #409EFF;
+    }
+
+    a:hover {
+        color: #79a5e5;
+    }
+
+    .item {
+        height: 20px;
+        margin: 5px 5px 5px 0;
+    }
+
+    .item span {
+        margin: 5px 5px 5px 0;
     }
 </style>

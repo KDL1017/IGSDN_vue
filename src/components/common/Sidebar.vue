@@ -3,19 +3,33 @@
         <!-- 前台遍历是自己循环-->
         <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="white"
                  text-color="black" active-text-color="#00d1b2" unique-opened router>
-            <SiderBarTree :items="items"></SiderBarTree>
-
+            <template v-for="item in items">
+                <el-submenu :index="item.index" :key="item.index" v-if="item.subs && item.subs.length > 0">
+                    <template slot="title">
+                        <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
+                    </template>
+                    <template>
+                        <SidebarTree :items="item.subs"></SidebarTree>
+                    </template>
+                </el-submenu>
+                <template v-else>
+                    <el-menu-item :index="item.index" :key="item.index">
+                        <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
+                    </el-menu-item>
+                </template>
+            </template>
         </el-menu>
     </div>
 </template>
 
 <script>
-    import SiderBarTree from './SidebarTree'
+    import SidebarTree from './SidebarTree'
     import bus from '../common/bus'
     import axios from 'axios'
+
     export default {
-        components:{
-            SiderBarTree
+        components: {
+            SidebarTree
         },
         data() {
             return {
@@ -24,80 +38,19 @@
                     {
                         icon: 'el-icon-house',
                         index: 'recommendation',
-                        title: '首页'
+                        title: '个人首页'
                     },
                     {
-                        icon: 'el-icon-lx-home',
-                        index: 'documentComments',
-                        title: '文件评论'
+                        icon: 'el-icon-news',
+                        index: 'knowledge',
+                        title: '全部知识',
+                        subs: [],
                     },
                     {
                         icon: 'el-icon-document',
-                        index: '2',
-                        title: '全部知识',
-                        subs: [],
-                        /*[
-                            {
-                                index: 'knowledge-1',
-                                title: '编程语言',
-                                subs: [
-                                    {
-                                        index: 'knowledge-1',
-                                        title: '推荐',
-                                    },
-                                    {
-                                        index: 'knowledge-2',
-                                        title: 'C/C++',
-                                    },
-                                    {
-                                        index: 'knowledge-3',
-                                        title: 'java',
-                                    },
-                                    {
-                                        index: 'knowledge-4',
-                                        title: 'C#'
-                                    },
-                                    {
-                                        index: 'knowledge-5',
-                                        title: 'JavaScript'
-                                    },
-                                ]
-                            },
-                        ]*/
-
-                    },
-                    {
-                        icon: 'el-icon-tickets',
                         index: 'knowledge-private',
                         title: '个人知识',
                         subs: []
-                           /* {
-                                index: 'knowledge-private-base',
-                                title: '计算机基础'
-                            },
-                            {
-                                index: '2-2',
-                                title: '编程语言',
-                                subs: [
-                                    {
-                                        index: 'knowledge-private-2',
-                                        title: 'C/C++',
-                                    },
-                                    {
-                                        index: 'knowledge-private-3',
-                                        title: 'java',
-                                    },
-                                    {
-                                        index: 'knowledge-private-4',
-                                        title: 'C#'
-                                    },
-                                    {
-                                        index: 'knowledge-private-5',
-                                        title: 'JavaScript'
-                                    },
-                                ]
-                            },
-                        ]*/
                     },
                     {
                         icon: 'el-icon-upload2',
@@ -108,21 +61,10 @@
             }
         },
         mounted() {
-            axios.get("/IGSDN/listSimpleCategories").then((res) => {
-               // console.log(res.data)
-                let i = 0
-               //console.log(res.data.children)
-
-
-
-
-                this.items[2].subs = res.data[0].subs
-                this.items[3].subs = res.data[1].subs
-                //console.log(this.items)
-                //console.log(this.items[2].subs[0].node.index)
-                //console.log(this.items)
-
-            }).catch((e) => {
+            axios.get("/IGSDN/getAllCategoryTree").then((res) => {
+                this.items[1].subs = res.data[0]
+                this.items[2].subs = res.data[1]
+            }).catch((err) => {
 
             })
         },

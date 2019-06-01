@@ -18,7 +18,7 @@
             ></mavon-editor>
         </div>
         <div v-loading.fullscreen.lock="isFirstLoading && isLoading"></div>
-        <div v-loading="!isFirstLoading && isLoading"></div>
+        <div style="margin: 60px" v-loading="!isFirstLoading && isLoading"></div>
     </div>
 </template>
 
@@ -26,6 +26,7 @@
     import {mavonEditor} from 'mavon-editor'
     import 'mavon-editor/dist/css/index.css'
     import axios from 'axios'
+
     export default {
         name: "DocumentOnlinePreview",
         components: {
@@ -37,6 +38,7 @@
                 type: "",
                 isSuccess: true,
                 isLoading: true,
+                isFinish: false,
                 documentId: 0,
                 documentType: 0,
                 documentUrl: '',
@@ -50,6 +52,7 @@
             this.documentId = this.$route.query.documentId
             this.documentType = this.$route.query.documentType
             this.documentUrl = this.$route.query.documentUrl
+            this.isFinish = false
             this.loadDocumentData()
         },
         mounted() {
@@ -88,7 +91,7 @@
                 })
             },
             handleScroll(e) {
-                if (!this.isScrolling && !this.isLoading) {
+                if (!this.isScrolling && !this.isLoading && !this.isFinish) {
                     let scrollTop = document.documentElement.scrollTop
                     let windowHeight = document.documentElement.clientHeight
                     let scrollHeight = document.documentElement.scrollHeight
@@ -105,11 +108,16 @@
             handleData(data) {
                 if (this.isMarkdown(data)) {
                     this.documentData = data[1]
+                    this.isFinish = true
                 } else if (this.isImages(data)) {
                     data.shift()
-                    data.forEach((item) => {
-                        this.documentData.push("data:image/jpg;base64," + item)
-                    })
+                    if (!data) {
+                        this.isFinish = true
+                    } else {
+                        data.forEach((item) => {
+                            this.documentData.push("data:image/jpg;base64," + item)
+                        })
+                    }
                 }
             },
             isMarkdown(data) {

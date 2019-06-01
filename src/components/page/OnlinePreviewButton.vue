@@ -37,6 +37,19 @@
                         documentUrl: this.documentUrl,
                     }
                 })
+                this.open(routeUrl)
+            },
+            edit() {
+                let routeUrl = this.$router.resolve({
+                    name: "MarkdownEditor",
+                    path: "/MarkdownEditor",
+                    query: {
+                        documentId: this.documentId,
+                    }
+                })
+                this.open(routeUrl)
+            },
+            open(routeUrl) {
                 let width = window.innerWidth
                     || document.documentElement.clientWidth
                     || document.body.clientWidth;
@@ -47,14 +60,6 @@
                 height = height * 5 / 6
                 width = width * 5 / 6
                 window.open(routeUrl.href, "_blank", "height=" + height + ",width=" + width + ",top=80,left=80,toolbar=no, menubar=no, scrollbars=yes, resizable=yes");
-            },
-            edit() {
-                this.$router.push({
-                    name: 'MarkdownEditor',
-                    params: {
-                        documentId: this.documentId,
-                    },
-                })
             },
             download() {
 

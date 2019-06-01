@@ -1,10 +1,11 @@
 <template>
     <div>
-        <KnowledgeScroller  style="margin:0 10px"
-                v-if="!isPrivate" :isScrolling="isScrolling" :categoryId="categoryId" :changeFlag="changeFlag"
-                v-on:loadingFlag="receiveChildMsg"></KnowledgeScroller>
-        <KnowledgePagination  style="margin:0 10px"
-                v-if="isPrivate" :categoryId="categoryId" :changeFlag="changeFlag"></KnowledgePagination>
+        <KnowledgeScroller style="margin:0 10px"
+                           v-if="!isPrivate" :isScrolling="isScrolling" :categoryId="categoryId"
+                           :changeFlag="changeFlag"
+                           v-on:loadingFlag="receiveChildMsg"></KnowledgeScroller>
+        <KnowledgePagination style="margin:0 10px"
+                             v-if="isPrivate" :categoryId="categoryId" :changeFlag="changeFlag"></KnowledgePagination>
     </div>
 </template>
 
@@ -63,6 +64,8 @@
             },
             receiveChildMsg(loadingFlag) {
                 this.$emit("loadingFlag", loadingFlag)
+            }
+        }
     }
 </script>
 

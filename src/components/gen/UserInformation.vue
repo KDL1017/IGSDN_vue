@@ -5,16 +5,19 @@
                      active-text-color="#606266">
                 <el-submenu index="1">
                     <template slot="title">未读</template>
+                    <el-menu-item index="1-0">全部</el-menu-item>
                     <el-menu-item index="1-1">系统通知</el-menu-item>
                     <el-menu-item index="1-2">评论</el-menu-item>
                 </el-submenu>
                 <el-submenu index="2">
                     <template slot="title">已读</template>
-                    <el-menu-item index="2-1">系 统通知</el-menu-item>
+                    <el-menu-item index="2-0">全部</el-menu-item>
+                    <el-menu-item index="2-1">系统通知</el-menu-item>
                     <el-menu-item index="2-2">评论</el-menu-item>
                 </el-submenu>
                 <el-submenu index="3">
                     <template slot="title">垃圾箱</template>
+                    <el-menu-item index="3-0">全部</el-menu-item>
                     <el-menu-item index="3-1">系统通知</el-menu-item>
                     <el-menu-item index="3-2">评论</el-menu-item>
                 </el-submenu>
@@ -32,13 +35,13 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                            label="姓名"
+                            label="内容"
                             width="180">
                         <template slot-scope="scope">
-                            <el-popover trigger="hover" placement="top">
-                                <p>姓名: {{ scope.row.content }}</p>
+                            <el-popover trigger="hover" placement="top" style="cursor: pointer">
+                                <p>评论人：{{ scope.row.userName }}</p>
                                 <div slot="reference" class="name-wrapper">
-                                    <el-tag size="medium">{{ scope.row.commentatorName }}</el-tag>
+                                    <el-tag size="medium">{{ scope.row.content }}</el-tag>
                                 </div>
                             </el-popover>
                         </template>
@@ -84,7 +87,7 @@
                         <span>对话历史</span>
                     </div>
                     <el-timeline>
-                        <el-timeline-item v-for="(dc,index) in documentCommnent" :key="index" :timestamp="dc.remarkDate"
+                        <el-timeline-item v-for="(dc,index) in documentComment" :key="index" :timestamp="dc.remarkDate"
                                           placement="top">
                             <div style="margin-left: 40px">
                                 <p style="font-size: 16px;margin-left: 5px;margin-bottom: 5px;float: left">
@@ -96,7 +99,7 @@
                                 </div>
                             </div>
                         </el-timeline-item>
-                        <el-timeline-item v-for="(d,index) in documentCommnent2" :timestamp="d.remarkDate"
+                        <el-timeline-item v-for="(d,index) in documentComment2" :timestamp="d.remarkDate"
                                           placement="top">
                             <div style="margin-left: 40px">
                                 <p style="font-size: 16px;margin-left: 5px;margin-bottom: 5px;float: left">
@@ -131,8 +134,8 @@
                 </el-card>
             </div>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogCancel">取 消</el-button>
-                <el-button type="primary" @click="dialogSubmit" :disabled="showButton">确 定</el-button>
+                <el-button @click="dialogCancel">设为已读</el-button>
+                <el-button type="primary" @click="dialogSubmit" :disabled="showButton">提交</el-button>
             </div>
         </el-dialog>
     </div>
@@ -143,15 +146,12 @@
     import axios from 'axios'
     import moment from 'moment'
 
-    axios.defaults.baseURL = "http://localhost:8080/"
     export default {
         mounted() {
-            this.handleSelect('1-1', null)
-            //获取登录者的 ID
-            let ID = 1
-            this.ID = ID
-            axios.get('/IGSDN/genUser/userInformation/' + ID).then((res) => {
+            this.userId = localStorage.getItem("user_msg") ? localStorage.getItem("user_msg").id : 2
+            axios.get('/IGSDN/genUser/userInformation/' + this.userId).then((res) => {
                 this.data = res.data
+                this.handleSelect('1-0', null)
             }).catch((error) => {
                 console.log(error)
             })
@@ -160,14 +160,10 @@
             return {
                 dialogFormVisible: false,
                 dialogHistory: false,
-
-
                 documentID: '',
-                dc_id:'',
+                dc_id: '',
                 userID: '',
-                ID: '',
-
-
+                userId: '',
                 index: '',
                 value2: false,
                 showSubmitButton: 'true',
@@ -175,22 +171,9 @@
                 remark_content: '',
                 showDel: "",
                 activeIndex: '1-1',
-                data:// 0-未读  1-已读  2-垃圾箱
-                    [{
-                        content: "翠花我爱你",
-                        documentName: "111",
-                        id: '',//信息通知ID
-                        is_dentify: '',
-                        remark_date: "",
-                        source: '1',//0:系统消息 1:用户消息(首次) 2:用户消息(非首次)
-                        state: '1',//0:垃圾箱 1:未读 2:已读 3:已回复
-                        dc_id:'',
-                        documentID: '',
-                        userID: ''
-                    },],
+                data: [],
                 tableData: [],
-                documentCommnent: [{
-
+                documentComment: [{
                     commentator: '',
                     content: "",
                     document: '',
@@ -200,8 +183,7 @@
                     commentatorName: '',
                     documentName: ''
                 }],
-                documentCommnent2: [{
-
+                documentComment2: [{
                     commentId: '',
                     commentator: '',
                     content: "",
@@ -216,20 +198,16 @@
 
                 formLabelWidth: '120px'
             }
-        }, computed: {
-            show: function () {
+        },
+        computed: {
+            show() {
                 let showDel = this.showDel.splice('-')
                 if (showDel[0] === 3)
                     return true
             },
-            reverseSum: function () {
-                return this.documentCommnent2.reverse();
-            },
             showButton() {
                 return (this.remark_content.trim().length < 50 && this.remark_content.trim().length > 0) ? this.showSubmitButton = false : this.showSubmitButton = true
             },
-
-
         },
         methods: {
             handleSelect(key, keyPath) {
@@ -238,26 +216,29 @@
                 let a = s.split("-")
                 switch (a[0]) {
                     case '1':
-                        a.shift()
-                        if (a[0] === '1') {
+                        if (a[1] === '0') {
+                            this.tableData = this.data.filter(item => item.state === 1)
+                        } else if (a[1] === '1') {
                             this.tableData = this.data.filter(item => item.source === "0" && item.state === 1)
-                        } else if (a[0] === '2') {//其他用户
+                        } else if (a[1] === '2') {//其他用户
                             this.tableData = this.data.filter(item => item.source !== "0" && item.state === 1)
                         }
                         break;
                     case '2':
-                        a.shift()
-                        if (a[0] === '1') {
+                        if (a[1] === '0') {
+                            this.tableData = this.data.filter(item => item.state === 2 || item.state === 3)
+                        } else if (a[1] === '1') {
                             this.tableData = this.data.filter(item => item.source === "0" && (item.state === 2 || item.state === 3))
-                        } else if (a[0] === '2') {
+                        } else if (a[1] === '2') {
                             this.tableData = this.data.filter(item => item.source !== "0" && (item.state === 2 || item.state === 3))
                         }
                         break;
                     case '3':
-                        a.shift()
-                        if (a[0] === '1') {
+                        if (a[1] === '0') {
+                            this.tableData = this.data.filter(item => item.state === 0)
+                        } else if (a[1] === '1') {
                             this.tableData = this.data.filter(item => item.source === "0" && item.state === 0)
-                        } else if (a[0] === '2') {
+                        } else if (a[1] === '2') {
                             this.tableData = this.data.filter(item => item.source !== "0" && item.state === 0)
                         }
                         break;
@@ -268,27 +249,27 @@
 
                 axios.get('/IGSDN/genUser/showRemark/' + row.id).then((res) => {
                     let document = res.data
-                    let documentCommnent = document['list1']
-                    let documentCommnent2 = document['list2']
+                    let documentComment = document['list1']
+                    let documentComment2 = document['list2']
                     let i = 0;
 
-                    for (; i < documentCommnent.length; i++) {
-                        if (documentCommnent[i].identify) {
-                            documentCommnent[i].commentatorName = '匿名'
+                    for (; i < documentComment.length; i++) {
+                        if (documentComment[i].identify) {
+                            documentComment[i].commentatorName = '匿名'
                         }
                     }
 
-                    for (i = 0; i < documentCommnent2.length; i++) {
-                        if (documentCommnent2[i].commentator === this.ID) {
-                            documentCommnent2[i].commentatorName = '您'
-                        } else if (documentCommnent2[i].identify && documentCommnent2[i].commentator !== this.ID) {
-                            documentCommnent2[i].commentatorName = '匿名'
+                    for (i = 0; i < documentComment2.length; i++) {
+                        if (documentComment2[i].commentator === this.userId) {
+                            documentComment2[i].commentatorName = '您'
+                        } else if (documentComment2[i].identify && documentComment2[i].commentator !== this.userId) {
+                            documentComment2[i].commentatorName = '匿名'
                         }
                     }
-                    this.documentCommnent2 = documentCommnent2.sort(function (a, b) {
+                    this.documentComment2 = documentComment2.sort(function (a, b) {
                         return (a['id'] < b['id']) ? -1 : ((a['id'] > b['id']) ? 1 : 0)
                     })
-                    this.documentCommnent = documentCommnent
+                    this.documentComment = documentComment
                 }).catch((error) => {
                     console.log(error)
                 })
@@ -299,9 +280,17 @@
                 let state = 0
                 axios.put('/IGSDN/genUser/userInformationRemove/', {userInformationID, state}).then((res) => {
                     if (res.data)
-                        alert('修改成功')
+                        this.$message({
+                            showClose: true,
+                            message: '修改成功',
+                            type: 'success'
+                        });
                     else
-                        alert('修改shibai')
+                        this.$message({
+                            showClose: true,
+                            message: '修改失败',
+                            type: 'error'
+                        });
                 }).catch((error) => {
                     console.log(error)
                 })
@@ -315,28 +304,11 @@
                 this.thisRowID = row.dc_id
                 this.thisRowType = row.source
                 this.documentID = row.documentID
-
                 this.userID = row.userID
-
                 this.dialogFormVisible = true
                 this.index = index
-
-
             },
             handleDelete(index, row) {
-                let id = row.id
-                axios.delete('/IGSDN/genUser/userInformationDelete/' + id).then((res) => {
-                    if (res.data)
-                        return '删除成功'
-                    else
-                        return '未删除'
-                }).catch((error) => {
-                    console.log(error)
-                })
-                this.tableData.splice(this.index, 1)
-            },
-
-            open() {
                 this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -345,25 +317,34 @@
                     this.$message({
                         type: 'success',
                         message: '删除成功!'
-                    });
+                    })
+                    let id = row.id
+                    axios.delete('/IGSDN/genUser/userInformationDelete/' + id).then((res) => {
+                        if (res.data)
+                            return '删除成功'
+                        else
+                            return '未删除'
+                    }).catch((error) => {
+                        console.log(error)
+                    })
+                    this.tableData.splice(this.index, 1)
                 }).catch(() => {
                     this.$message({
                         type: 'info',
-                        message: '已取消删除'
+                        message: '已取消'
                     });
                 });
             },
             dialogSubmit() {//回复
-
                 if (this.tableData[this.index].state === 1 || this.tableData[this.index].state === 2) {
                     this.tableData[this.index].state === 3
                     let state = this.tableData[this.index].state
                     let userInformationID = this.tableData[this.index].id
                     axios.put('/IGSDN/genUser/userInformationRemove/', {userInformationID, state}).then((res) => {
-                        if (res.data)
-                        {this.tableData.splice(this.index, 1)
-                            return '修改成功'}
-                        else
+                        if (res.data) {
+                            this.tableData.splice(this.index, 1)
+                            return '修改成功'
+                        } else
                             return '未修改'
                     }).catch((error) => {
                         console.log(error)
@@ -382,21 +363,28 @@
                 documentComment2.document = this.documentID
                 documentComment2.commentId = this.thisRowID
                 documentComment2.content = this.remark_content
-                documentComment2.commentator = this.ID
+                documentComment2.commentator = this.userId
                 documentComment2.remarkDate = moment().utc().format('YYYY-MM-DD')
                 documentComment2.isIdentify = this.value2
-                console.log(this.documentCommnent2)
                 documentComment2.id = null
 
                 axios.post('/IGSDN/genUser/userInformationRemark/', {
                     'documentComment2String': JSON.stringify(documentComment2),
-                    'receive':receive
+                    'receive': receive
                 }).then((res) => {
-                    if (res.data)
-                    {this.dialogFormVisible = false
-                        alert('评论成功')}
-                    else
-                        alert('评论失败')
+                    if (res.data) {
+                        this.dialogFormVisible = false
+                        this.$message({
+                            showClose: true,
+                            message: '回复成功',
+                            type: 'success'
+                        })
+                    } else
+                        this.$message({
+                            showClose: true,
+                            message: '回复失败',
+                            type: 'error'
+                        })
                 }).catch((error) => {
                     console.log(error)
                 })

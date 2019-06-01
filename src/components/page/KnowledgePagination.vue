@@ -9,6 +9,7 @@
                 <div style="margin: 10px auto;text-align: center"><i class="el-icon-loading" v-show="isLoading"></i>{{msg}}</div>
                 <KnowledgeItem v-for="document in documentList" :document="document" :key="document.id"
                                :isPrivate="true"
+                               :isPublic="document.public"
                                style="margin: 0 20px 20px 0;width: auto;display:inline-block !important; display:inline;"/>
             </el-card>
             <el-card>
@@ -49,7 +50,7 @@
             }
         },
         mounted() {
-            this.userId = localStorage.getItem("user_msg") ? localStorage.getItem("user_msg").id : 2
+            this.userId = JSON.parse(localStorage.getItem('user_msg')).id
             this.init(true)
         },
         watch: {
@@ -100,7 +101,7 @@
                     userId,
                     categoryId,
                     currentPage,
-                    pageSize
+                    pageSize,
                 }).then((res) => {
                     this.documentList = res.data.data
                     this.total = res.data.total

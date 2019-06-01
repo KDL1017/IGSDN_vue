@@ -1,20 +1,26 @@
 <template>
     <div style="width:50%;margin:50px auto">
-        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="原密码" prop="oldPass">
-                <el-input type="password" v-model="ruleForm.oldPass" auto-complete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="密码" prop="pass">
-                <el-input type="password" v-model="ruleForm.pass" auto-complete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="确认密码" prop="confirmPass">
-                <el-input type="password" v-model="ruleForm.confirmPass" auto-complete="off"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
-                <el-button @click="resetForm('ruleForm')">重置</el-button>
-            </el-form-item>
-        </el-form>
+        <el-card class="box-card">
+            <div slot="header" class="clearfix">
+                <span>修改密码</span>
+            </div>
+            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px"
+                     class="demo-ruleForm">
+                <el-form-item label="原密码" prop="oldPass">
+                    <el-input type="password" v-model="ruleForm.oldPass" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop="pass">
+                    <el-input type="password" v-model="ruleForm.pass" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="确认密码" prop="confirmPass">
+                    <el-input type="password" v-model="ruleForm.confirmPass" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+                    <el-button @click="resetForm('ruleForm')">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-card>
     </div>
 </template>
 
@@ -51,6 +57,7 @@
                 }
             };
             return {
+                checkResult: false,
                 ruleForm: {
                     oldPass: '',
                     pass: '',
@@ -72,11 +79,11 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        let loginName = JSON.parse(localStorage.getItem('user_msg')).id
+                        let userId = JSON.parse(localStorage.getItem('user_msg')).id
                         // let loginName = t_user? t_user:user_msg
                         let oldPass = this.ruleForm.oldPass
                         let pass = this.ruleForm.pass
-                        axios.put('/IGSDN/genUser/updatePassword/' + loginName, {oldPass, pass}).then((res) => {
+                        axios.put('/IGSDN/genUser/updatePassword/' + userId, {oldPass, pass}).then((res) => {
                             if (res.data) {
                                 this.$message({
                                     type: 'success',
@@ -85,10 +92,10 @@
                             } else {
                                 this.$message({
                                     type: 'error',
-                                    message: '服务器异常，请稍后再试!'
+                                    message: '原密码错误!'
                                 })
                             }
-                        }).catch(()=>{
+                        }).catch(() => {
                             this.$message({
                                 type: 'error',
                                 message: '修改失败，请检查网络连接!'
