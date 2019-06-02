@@ -11,14 +11,11 @@ body,
     height: 100%;
 }
 
-body {
-    font-family: 'PingFang SC', "Helvetica Neue", Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
-}
+
 
 a {
     text-decoration: none
 }
-
 
 .content-box {
     position: absolute;

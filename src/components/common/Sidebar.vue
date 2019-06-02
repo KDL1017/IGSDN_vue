@@ -1,26 +1,17 @@
 <template>
     <div class="sidebar">
+        <!-- 前台遍历是自己循环-->
         <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="white"
                  text-color="black" active-text-color="#00d1b2" unique-opened router>
             <template v-for="item in items">
-                <template v-if="item.subs">
-                    <el-submenu :index="item.index" :key="item.index">
-                        <template slot="title">
-                            <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
-                        </template>
-                        <template v-for="subItem in item.subs">
-                            <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
-                                <template slot="title">{{ subItem.title }}</template>
-                                <el-menu-item v-for="(threeItem,i) in subItem.subs" :key="i" :index="threeItem.index">
-                                    {{ threeItem.title }}
-                                </el-menu-item>
-                            </el-submenu>
-                            <el-menu-item v-else :index="subItem.index" :key="subItem.index">
-                                {{ subItem.title }}
-                            </el-menu-item>
-                        </template>
-                    </el-submenu>
-                </template>
+                <el-submenu :index="item.index" :key="item.index" v-if="item.subs && item.subs.length > 0">
+                    <template slot="title">
+                        <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
+                    </template>
+                    <template>
+                        <SidebarTree :items="item.subs"></SidebarTree>
+                    </template>
+                </el-submenu>
                 <template v-else>
                     <el-menu-item :index="item.index" :key="item.index">
                         <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
@@ -32,107 +23,48 @@
 </template>
 
 <script>
-    import bus from '../common/bus';
+    import SidebarTree from './SidebarTree'
+    import bus from '../common/bus'
+    import axios from 'axios'
 
     export default {
+        components: {
+            SidebarTree
+        },
         data() {
             return {
                 collapse: false,
                 items: [
                     {
-                        icon: 'el-icon-lx-home',
+                        icon: 'el-icon-house',
                         index: 'recommendation',
-                        title: '首页'
+                        title: '个人首页'
+                    },
+                    {
+                        icon: 'el-icon-news',
+                        index: 'knowledge',
+                        title: '全部知识',
+                        subs: [],
                     },
                     {
                         icon: 'el-icon-document',
-                        index: '2',
-                        title: '知识分类',
-                        subs: [
-                            {
-                                index: 'knowledge-base',
-                                title: '计算机基础'
-                            },
-                            {
-                                index: '2-2',
-                                title: '编程语言',
-                                subs: [
-                                    {
-                                        index: 'knowledge-pl-C',
-                                        title: 'C'
-                                    },
-                                    {
-                                        index: 'knowledge-pl-java',
-                                        title: 'java'
-                                    },
-                                    {
-                                        index: 'knowledge-pl-C#',
-                                        title: 'C#'
-                                    },
-                                    {
-                                        index: 'knowledge-pl-Kotlin',
-                                        title: 'Kotlin'
-                                    },
-                                    {
-                                        index: 'knowledge-pl-Python',
-                                        title: 'Python'
-                                    },
-                                    {
-                                        index: 'knowledge-pl-JavaScript',
-                                        title: 'JavaScript'
-                                    }
-                                ]
-                            },
-                        ]
-                    },
-                    {
-                        icon: 'el-icon-reading',
-                        index: '3',
+                        index: 'knowledge-private',
                         title: '个人知识',
-                        subs: [
-                            {
-                                index: 'knowledge-private-base',
-                                title: '计算机基础'
-                            },
-                            {
-                                index: '2-2',
-                                title: '编程语言',
-                                subs: [
-                                    {
-                                        index: 'knowledge-private-pl-C',
-                                        title: 'C'
-                                    },
-                                    {
-                                        index: 'knowledge-private-pl-java',
-                                        title: 'java'
-                                    },
-                                    {
-                                        index: 'knowledge-private-pl-C#',
-                                        title: 'C#'
-                                    },
-                                    {
-                                        index: 'knowledge-private-pl-Kotlin',
-                                        title: 'Kotlin'
-                                    },
-                                    {
-                                        index: 'knowledge-private-pl-Python',
-                                        title: 'Python'
-                                    },
-                                    {
-                                        index: 'knowledge-private-pl-JavaScript',
-                                        title: 'JavaScript'
-                                    }
-                                ]
-                            },
-                        ]
-                    },
-                    {
-                        icon: 'el-icon-upload2',
-                        index: 'upload',
-                        title: '文件上传'
+                        subs: []
                     },
                 ]
             }
+        },
+        mounted() {
+            let preList = []
+            preList.push("knowledge-")
+            preList.push("knowledge-private-")
+            axios.post("/IGSDN/getAllCategoryTree", {preList}).then((res) => {
+                this.items[1].subs = res.data[0]
+                this.items[2].subs = res.data[1]
+            }).catch((err) => {
+
+            })
         },
         computed: {
             onRoutes() {

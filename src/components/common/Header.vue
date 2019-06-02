@@ -16,7 +16,7 @@
                 <!-- 消息中心 -->
                 <div class="btn-bell">
                     <el-tooltip effect="dark" :content="message?`有${message}条未读消息`:`消息中心`" placement="bottom">
-                        <router-link to="userinformation">
+                        <router-link to="userInformation">
                             <i class="el-icon-bell"></i>
                         </router-link>
                     </el-tooltip>
@@ -25,12 +25,11 @@
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}} <i class="el-icon-caret-bottom"></i>
+                        {{uname}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-
-                        <el-dropdown-item divided command="changePassword">修改密码</el-dropdown-item>
                         <el-dropdown-item divided command="userCenter">个人中心</el-dropdown-item>
+                        <el-dropdown-item divided command="changePassword">修改密码</el-dropdown-item>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -40,25 +39,20 @@
 
 </template>
 <script>
-    import bus from '../common/bus';
+    import bus from '../common/bus'
+    import axios from 'axios'
+    import PubSub from 'pubsub-js'
 
     export default {
         data() {
             return {
                 collapse: false,
                 fullscreen: false,
-                name: 'linxin',
+                uname: '',
                 message: 2
             }
         },
-        computed: {
-            username() {
-                let username = localStorage.getItem('ms_username');
-                return username ? username : this.name;
-            }
-        },
         methods: {
-            // 用户名下拉菜单选择事件
             handleCommand(command) {
                 if (command == 'loginout') {
                     localStorage.removeItem('t_user')
@@ -71,7 +65,6 @@
                 if (command == 'userCenter') {
                     this.$router.push('userCenter');
                 }
-
             },
 
 
@@ -106,12 +99,28 @@
                     }
                 }
                 this.fullscreen = !this.fullscreen;
+            },
+            getMessageNum() {
+                const userId = JSON.parse(localStorage.getItem('user_msg')).id
+                axios.get('/IGSDN/genUser/countUnReadUserInformationByUserId/' + userId).then((res) => {
+                    this.message = res.data
+                }).catch((error) => {
+                    console.log(error)
+                })
             }
         },
+        created(){
+            this.uname = JSON.parse(localStorage.getItem('user_msg')).uname
+        },
         mounted() {
+            this.uname = JSON.parse(localStorage.getItem('user_msg')).uname
+            PubSub.subscribe('removeInformationNum', (event, data) => {
+                this.message -= data
+            })
             if (document.body.clientWidth < 1500) {
                 this.collapseChage();
             }
+            this.getMessageNum()
         }
     }
 </script>

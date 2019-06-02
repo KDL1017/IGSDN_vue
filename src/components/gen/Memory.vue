@@ -1,122 +1,77 @@
 <template>
     <div>
-        <el-card class="box-card" style="width:50%;margin:50px auto">
-            <div slot="header" class="clearfix">
-                <div><span>总容量:500G</span></div>
-                <div>
-                    <el-progress :percentage="80"></el-progress>
-                </div>
-                <el-button type="primary" v-on:click="userUpload">上传<i class="el-icon-upload el-icon--right"></i>
-                </el-button>
-            </div>
+        <el-card class="box-card" style="width:700px;margin:50px auto;padding:20px">
+            <table style="float: left;width: 50%">
+                <tr style="height:150px">
+                    <td align="center">总内存：</td>
+                    <td align="center">
+                        <el-progress type="circle" :stroke-width="10" :percentage="100"></el-progress>
+                    </td>
+                </tr>
+                <tr style="height:150px">
+                    <td align="center">已使用内存：</td>
+                    <td align="center">
+                        <el-progress :stroke-width="10" type="circle"
+                                     :percentage="parseFloat(this.data.percentUsedMemory)"></el-progress>
+                    </td>
+                </tr>
+            </table>
+            <table style="float: left;width: 50%;margin-top: 40px">
+                <tr style="height: 30px">
+                    <td align="center">总内存：</td>
+                    <td align="center">{{data.totalMemory}}</td>
+                </tr>
+                <tr style="height: 30px">
+                    <td align="center">剩余内存：</td>
+                    <td align="center">{{data.remainingMemory}}</td>
+                </tr>
+                <tr style="height: 30px">
+                    <td align="center">总文件数：</td>
+                    <td align="center">{{data.documentTotal}}</td>
+                </tr>
+                <tr style="height: 30px">
+                    <td align="center">公有文档数：</td>
+                    <td align="center">{{data.publicDocumentTotal}}</td>
+                </tr>
+                <tr style="height: 30px">
+                    <td align="center">私有文档数：</td>
+                    <td align="center">{{data.privateDocumentTotal}}</td>
+                </tr>
+                <tr style="height: 80px">
+                    <td align="center" colspan="2">
+                        <el-button type="primary" v-on:click="userUpload">
+                            上传新文档<i class="el-icon-upload el-icon--right"></i>
+                        </el-button>
+                    </td>
+                </tr>
+            </table>
 
-            <div class="block">
-                <span class="demonstration">已上传的文档</span>
-                <div>
-                    <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <el-tab-pane label="上传成功" name="first">
-                            <div>
-                                <el-table
-                                        :data="tableData"
-                                        style="width: 100%">
-                                    <el-table-column
-                                            prop="date"
-                                            label="日期"
-                                            width="180">
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="name"
-                                            label="文件名"
-                                            width="180">
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="states"
-                                            label="状态">
-                                    </el-table-column>
-                                </el-table></div>
-                            <el-pagination
-                                    @size-change="handleSizeChange"
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage4"
-                                    :page-sizes="[100, 200, 300, 400]"
-                                    :page-size="100"
-                                    layout="total, sizes, prev, pager, next, jumper"
-                                    :total="400">
-                            </el-pagination>
-                        </el-tab-pane>
-                        <el-tab-pane label="待审核" name="second">
-                            <div>
-                                <el-table
-                                        :data="tableData"
-                                        style="width: 100%">
-                                    <el-table-column
-                                            prop="date"
-                                            label="日期"
-                                            width="180">
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="name"
-                                            label="文件名"
-                                            width="180">
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="states"
-                                            label="状态">
-                                    </el-table-column>
-                                </el-table></div>
-                            <el-pagination
-                                    @size-change="handleSizeChange"
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage4"
-                                    :page-sizes="[100, 200, 300, 400]"
-                                    :page-size="100"
-                                    layout="total, sizes, prev, pager, next, jumper"
-                                    :total="400">
-                            </el-pagination>
-                        </el-tab-pane>
-                        <el-tab-pane label="上传失败" name="third"><div>
-                            <el-table
-                                    :data="tableData"
-                                    style="width: 100%">
-                                <el-table-column
-                                        prop="date"
-                                        label="日期"
-                                        width="180">
-                                </el-table-column>
-                                <el-table-column
-                                        prop="name"
-                                        label="文件名"
-                                        width="180">
-                                </el-table-column>
-                                <el-table-column
-                                        prop="states"
-                                        label="状态">
-                                </el-table-column>
-                            </el-table></div>
-                            <el-pagination
-                                    @size-change="handleSizeChange"
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage4"
-                                    :page-sizes="[100, 200, 300, 400]"
-                                    :page-size="100"
-                                    layout="total, sizes, prev, pager, next, jumper"
-                                    :total="400">
-                            </el-pagination></el-tab-pane>
-                    </el-tabs>
-                </div>
-
-
-            </div>
         </el-card>
-
     </div>
 </template>
 
 <script>
+    import axios from 'axios'
 
     export default {
         name: "Memory",
+        mounted() {
+            this.userId = JSON.parse(localStorage.getItem("user_msg")).id
+            this.getUserMemoryInfo()
+        },
+        watch: {
+            $route() {
+                this.getUserMemoryInfo()
+            },
+        },
         methods: {
+            getUserMemoryInfo() {
+                axios.get("/IGSDN/genUser/getUserMemoryInfo/" + this.userId).then((res) => {
+                    this.data = res.data
+                }).catch(() => {
+                    this.$message.error('服务器连接失败')
+                })
+            },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
             },
@@ -124,26 +79,31 @@
                 console.log(`当前页: ${val}`);
             },
             userUpload() {
-                this.$router.push('userUpload');
+                this.$router.push('upload');
             },
             handleClick(tab, event) {
                 console.log(tab, event);
             }
-            },
-            data() {
-                return {
-                    activeName: 'first',
-                    tableData: [{
-                        date: '2016-05-02',
-                        name: '王小虎',
-                        states: '查看状态'
-                    }],
-                    currentPage1: 5,
-                    currentPage2: 5,
-                    currentPage3: 5,
-                    currentPage4: 4
-                };
-            }
+        },
+        data() {
+            return {
+                activeName: 'first',
+                userId: null,
+                data: {
+                    percentUsedMemory: '',
+                    totalMemory: '',
+                    remainingMemory: '',
+                    documentTotal: 0,
+                    publicDocumentTotal: 0,
+                    privateDocumentTotal: 0
+                },
+
+                currentPage1: 5,
+                currentPage2: 5,
+                currentPage3: 5,
+                currentPage4: 4
+            };
+        }
 
     }
 </script>
@@ -155,6 +115,10 @@
 
     .item {
         margin-bottom: 18px;
+    }
+
+    .clearfix div {
+        margin: 10px;
     }
 
     .clearfix:before,

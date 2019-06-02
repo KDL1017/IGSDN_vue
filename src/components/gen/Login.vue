@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <div class="w3layouts">
+        <div class="w3layouts ">
             <div class="signin-agile">
                 <h2>登录
                 </h2>
@@ -94,6 +94,7 @@
                 $("html,body").animate({scrollTop: 0}, 800)
             },
             checkLogin() {
+                this.$router.push("/genUser")
                 const {loginName, password} = this
                 if (loginName && password) {
                     this.isLoading = true
@@ -102,10 +103,9 @@
                         if (res.data) {
                             this.msg = ''
                             localStorage.setItem("t_user", "gen")
-                            localStorage.setItem("user_msg", res.data)
-                            this.$router.push({
-                                path: `/`,
-                            })
+                            localStorage.setItem("user_msg", JSON.stringify(res.data))
+                            console.log(res.data)
+                            this.$router.push("/")
                         } else {
                             this.msg = '用户名或密码错误！'
                         }
@@ -124,6 +124,16 @@
 <style scoped>
     @import url('../../assets/css/login.css');
     @import url('../../assets/css/popup-box.css');
+
+    input[type="text"], input[type="password"] {
+        width: 93.5%;
+        padding: 15px;
+        border: 1px solid #7d7d7d;
+        outline: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+        border-radius: 25px;
+    }
 
     #login_loader {
         position: relative;

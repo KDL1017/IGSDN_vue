@@ -1,39 +1,62 @@
 <template>
-    <div style="margin: 0 auto">
+    <div class="filter-list-recommend" ref="list">
         <el-container>
-            <el-container>
-                <el-header>Header</el-header>
-                <el-main>
-                    <el-carousel style="width: 60%;margin:2px">
-                        <el-carousel-item v-for="item in 4" :key="item">
-                            <h3 class="small">{{ item }}</h3>
-                        </el-carousel-item>
-                    </el-carousel>
-                    <div style="height:200px;background-color:red">
-                    </div>
-                </el-main>
-            </el-container>
+            <!--            <el-header>-->
+            <!--            </el-header>-->
+            <el-main>
+                <!--                <div class="block">-->
+                <!--                    <el-carousel trigger="click" height="150px" style="width: 600px">-->
+                <!--                        <el-carousel-item v-for="item in 4" :key="item">-->
+                <!--                            <h3>{{ item }}</h3>-->
+                <!--                        </el-carousel-item>-->
+                <!--                    </el-carousel>-->
+                <!--                </div>-->
+                <KnowledgeScroller :isScrolling="isScrolling" v-on:loadingFlag="receiveChildMsg" :userId="userId"
+                                   :changeFlag="changeFlag" class="block"></KnowledgeScroller>
+            </el-main>
         </el-container>
     </div>
 </template>
-
 <script>
+    import KnowledgeScroller from './KnowledgeScroller'
+
     export default {
         name: "Recommendation",
+        props: ['isScrolling'],
+        components: {KnowledgeScroller},
         data() {
             return {
-                activeName: '1'
-            };
-        }
+                userId: 0,
+                changeFlag: true,
+            }
+        },
+        mounted() {
+            this.userId = localStorage.getItem("user_msg") ? localStorage.getItem("user_msg").id : 2
+            this.changeFlag = !this.changeFlag
+        },
+        computed: {
+            $route() {
+                this.changeFlag = !this.changeFlag
+            }
+        },
+        methods: {
+            receiveChildMsg(loadingFlag) {
+                this.$emit("loadingFlag", loadingFlag)
+            }
+        },
     }
 </script>
 
 <style scoped>
+    .block {
+        margin: 0 0 20px 5px;
+    }
+
     .el-carousel__item h3 {
         color: #475669;
         font-size: 14px;
         opacity: 0.75;
-        line-height: 200px;
+        line-height: 150px;
         margin: 0;
     }
 
@@ -45,37 +68,4 @@
         background-color: #d3dce6;
     }
 
-    .el-header, .el-footer {
-        background-color: #B3C0D1;
-        color: #333;
-        text-align: center;
-        line-height: 60px;
-    }
-
-    .el-aside {
-        background-color: #D3DCE6;
-        color: #333;
-        text-align: center;
-        line-height: 200px;
-    }
-
-    .el-main {
-        background-color: #E9EEF3;
-        color: #333;
-        text-align: center;
-        line-height: 160px;
-    }
-
-    body > .el-container {
-        margin-bottom: 40px;
-    }
-
-    .el-container:nth-child(5) .el-aside,
-    .el-container:nth-child(6) .el-aside {
-        line-height: 260px;
-    }
-
-    .el-container:nth-child(7) .el-aside {
-        line-height: 320px;
-    }
 </style>
