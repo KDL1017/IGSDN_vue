@@ -57,18 +57,20 @@
         name: "UserCenterMessage",
         data() {
             return {
+                userId: null,
                 userInfo: {
-                    uname: '张三的昵称',
-                    tel: '13789839972',
-                    email: null,
-                    name: '张三',
-                    gender: '男',
-                    age: '23'
+                    uname: '',
+                    tel: '',
+                    email: '',
+                    name: '',
+                    gender: '',
+                    age: ''
                 }
             }
         },
         mounted() {
-            const userId = JSON.parse(localStorage.getItem('user_msg')).id
+            this.userId = JSON.parse(localStorage.getItem('user_msg')).id
+            const userId = this.userId
             // let loginName = t_user? t_user:user_msg
             axios.get('/IGSDN/genUser/selectUserInfo/' + userId).then((res) => {
                 this.userInfo.name = res.data.name
@@ -91,6 +93,9 @@
             bindingUserLoginName(type) {
                 let msg = ""
                 let inputPattern = ""
+                let tel = ""
+                let email = ""
+                const userId = this.userId
                 if (type == "email") {
                     msg = "请输入邮箱"
                     inputPattern = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
@@ -100,14 +105,39 @@
                 }
                 this.$prompt(msg, '提示', {
                     confirmButtonText: '确定',
-                    cancelButtonText: '关闭',
+                    cancelButtonText: '取消',
                     inputPattern: inputPattern,
                     inputErrorMessage: '输入格式不正确'
-                }).then(({newValue}) => {
-                    this.$message({
-                        type: 'success',
-                        message: '你的邮箱是: ' + newValue
-                    });
+                }).then(({value}) => {
+                    console.log(value)
+                    if (type == "email") {
+                        email = value
+                    } else if (type == "tel") {
+                        tel = value
+                    }
+                    axios.put("/IGSDN/genUser/updateLoginName", {userId, tel, email}).then((res) => {
+                        if (res.data) {
+                            this.$message({
+                                type: 'success',
+                                message: '绑定成功'
+                            });
+                            if (type == "email") {
+                                this.userInfo.email = value
+                            } else if (type == "tel") {
+                                this.userInfo.tel = value
+                            }
+                        } else {
+                            this.$message({
+                                type: 'error',
+                                message: '绑定失败'
+                            });
+                        }
+                    }).catch(() => {
+                        this.$message({
+                            type: 'error',
+                            message: '服务器错误'
+                        });
+                    })
                 }).catch(() => {
 
                 });

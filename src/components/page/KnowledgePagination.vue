@@ -5,7 +5,7 @@
                 <el-input v-model="query" prefix-icon="el-icon-search" placeholder="文件搜索..." clearable
                           style="font-size: 14px;width: 640px;margin:5px 20px 20px 20px"
                           @keyup.enter.native="init(false)"></el-input>
-                <el-button type="primary" icon="el-icon-plus">上传新文件</el-button>
+                <el-button type="primary" icon="el-icon-plus" @click="upload">上传新文件</el-button>
                 <div style="margin: 10px auto;text-align: center"><i class="el-icon-loading" v-show="isLoading"></i>{{msg}}</div>
                 <KnowledgeItem v-for="document in documentList" :document="document" :key="document.id"
                                :isPrivate="true"
@@ -30,6 +30,7 @@
 
 <script>
     import axios from 'axios'
+    import PubSub from 'pubsub-js'
     import KnowledgeItem from './KnowledgeItem'
     import CategoryIntro from './CategoryIntro'
 
@@ -52,6 +53,11 @@
         mounted() {
             this.userId = JSON.parse(localStorage.getItem('user_msg')).id
             this.init(true)
+            PubSub.subscribe('deleteDocument', (event, data) => {
+                if (data) {
+                    this.listDocumentByPagination()
+                }
+            })
         },
         watch: {
             changeFlag() {
@@ -111,6 +117,9 @@
                     this.isLoading = false
                 })
             },
+            upload() {
+                this.$router.push('upload')
+            }
         },
     }
 </script>

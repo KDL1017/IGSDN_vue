@@ -64,12 +64,12 @@
                                     size="mini"
                                     @click="handleHistory(scope.$index, scope.row)">对话记录
                             </el-button>
-                            <el-button v-show="!(showDel==='3-1'||showDel==='3-2')"
+                            <el-button v-show="!(showDel==='3-0'||showDel==='3-1'||showDel==='3-2')"
                                        size="mini"
                                        type="danger"
                                        @click="handleRemove(scope.$index, scope.row)">删除
                             </el-button>
-                            <el-button v-show="showDel==='3-1'||showDel==='3-2'"
+                            <el-button v-show="showDel==='3-0'||showDel==='3-1'||showDel==='3-2'"
                                        size="mini"
                                        type="danger"
                                        @click="handleDelete(scope.$index, scope.row)">彻底删除
@@ -142,13 +142,24 @@
 </template>
 
 <script>
-    import Vue from 'vue'
+    import PubSub from 'pubsub-js'
     import axios from 'axios'
     import moment from 'moment'
 
     export default {
+        watch: {
+            $route() {
+                this.userId = JSON.parse(localStorage.getItem("user_msg")).id
+                axios.get('/IGSDN/genUser/userInformation/' + this.userId).then((res) => {
+                    this.data = res.data
+                    this.handleSelect('1-0', null)
+                }).catch((error) => {
+                    console.log(error)
+                })
+            }
+        },
         mounted() {
-            this.userId = localStorage.getItem("user_msg") ? localStorage.getItem("user_msg").id : 2
+            this.userId = JSON.parse(localStorage.getItem("user_msg")).id
             axios.get('/IGSDN/genUser/userInformation/' + this.userId).then((res) => {
                 this.data = res.data
                 this.handleSelect('1-0', null)
@@ -279,16 +290,17 @@
                 let userInformationID = row.id
                 let state = 0
                 axios.put('/IGSDN/genUser/userInformationRemove/', {userInformationID, state}).then((res) => {
-                    if (res.data)
+                    if (res.data) {
+                        PubSub.publish('removeInformationNum', 1)
                         this.$message({
                             showClose: true,
-                            message: '修改成功',
+                            message: '已放入垃圾箱',
                             type: 'success'
                         });
-                    else
+                    } else
                         this.$message({
                             showClose: true,
-                            message: '修改失败',
+                            message: '放入垃圾箱失败',
                             type: 'error'
                         });
                 }).catch((error) => {
@@ -320,9 +332,14 @@
                     })
                     let id = row.id
                     axios.delete('/IGSDN/genUser/userInformationDelete/' + id).then((res) => {
-                        if (res.data)
+                        if (res.data) {
+                            this.data.forEach((item, index) => {
+                                if (item.id == id) {
+                                    this.data.splice(index, 1)
+                                }
+                            })
                             return '删除成功'
-                        else
+                        } else
                             return '未删除'
                     }).catch((error) => {
                         console.log(error)
@@ -397,7 +414,6 @@
                     this.tableData[this.index].state = 2
                     let state = this.tableData[this.index].state
                     let userInformationID = this.tableData[this.index].id
-                    alert(userInformationID + "==" + state)
                     axios.put('/IGSDN/genUser/userInformationRemove/', {userInformationID, state}).then((res) => {
                         if (res.data)
                             return '修改成功'

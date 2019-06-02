@@ -74,6 +74,11 @@ export default new Router({
                     meta: {title: 'IGSDN - 用户消息'},
                 },
                 {
+                    path: 'upload',
+                    component: resolve => require(['../components/page/Upload.vue'], resolve),
+                    meta: {title: 'IGSDN - 文件上传'},
+                },
+                {
                     path: '*',
                     component: resolve => require(['../components/page/404.vue'], resolve),
                     meta: {title: '404'}

@@ -125,6 +125,16 @@
     @import url('../../assets/css/login.css');
     @import url('../../assets/css/popup-box.css');
 
+    input[type="text"], input[type="password"] {
+        width: 93.5%;
+        padding: 15px;
+        border: 1px solid #7d7d7d;
+        outline: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+        border-radius: 25px;
+    }
+
     #login_loader {
         position: relative;
         display: inline-block;

@@ -28,6 +28,7 @@
 </template>
 <script>
     import axios from 'axios'
+    import PubSub from 'pubsub-js'
 
     export default {
         props: ['document', 'isPrivate', 'isPublic'],
@@ -68,14 +69,15 @@
                     const documentId = this.document.id
                     axios.delete('/IGSDN/deleteDocument/' + documentId).then((res) => {
                         if (res.data) {
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            })
                             // 告诉父组件删除成功，重新请求页面信息
-
+                            PubSub.publish('deleteDocument', true)
                         }
                     })
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+
                     return true
                 }).catch(() => {
                     return false

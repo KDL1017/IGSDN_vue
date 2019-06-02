@@ -52,16 +52,14 @@
                         title: '个人知识',
                         subs: []
                     },
-                    {
-                        icon: 'el-icon-upload2',
-                        index: 'upload',
-                        title: '文件上传'
-                    },
                 ]
             }
         },
         mounted() {
-            axios.get("/IGSDN/getAllCategoryTree").then((res) => {
+            let preList = []
+            preList.push("knowledge-")
+            preList.push("knowledge-private-")
+            axios.post("/IGSDN/getAllCategoryTree", {preList}).then((res) => {
                 this.items[1].subs = res.data[0]
                 this.items[2].subs = res.data[1]
             }).catch((err) => {

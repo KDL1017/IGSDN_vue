@@ -4,17 +4,18 @@
 
             <el-form-item label="选择文件">
                 <div style="float: left">
-
                     <el-upload
                             class="upload-demo"
-                            :action="actionUrl"
+                            action="1"
                             :http-request="getFile"
                             :show-file-list="false"
                             drag
-                            multiple
-                    >
+                            multiple>
                         <i class="el-icon-upload"></i>
-                        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                        <div class="el-upload__text">
+                            可将文件拖到此处
+                            <div style="color: #909399; font-size: 12px">说明：文件大小限制为200MB</div>
+                        </div>
                     </el-upload>
                 </div>
 
@@ -40,6 +41,7 @@
                 <el-cascader
                         @change="handleChange"
                         :options="options"
+                        :props="optionProps"
                         :show-all-levels="false"
                 ></el-cascader>
             </el-form-item>
@@ -55,6 +57,7 @@
             <el-form-item label="添加标签">
                 <el-input v-model="tagsContent" @keyup.enter.native="intoTags" placeholder="不能超过10个字符"></el-input>
                 <el-tag
+                        style="margin: 10px 10px 0 0"
                         v-for="(tag,index) in tags"
                         :key="index" v-if="tag.name!==null"
                         closable
@@ -67,11 +70,10 @@
             <el-form-item label="文件封面">
                 <el-upload
                         class="avatar-uploader"
-                        :action="actionUrl"
+                        action="1"
                         :http-request="httpRequest"
                         :show-file-list="false"
-                        :on-remove="handleRemoveImg"
-                >
+                        :on-remove="handleRemoveImg">
                     <img v-if="imageUrl" :src="imageUrl" height="180px" width="360px" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
@@ -82,8 +84,10 @@
             </el-form-item>
 
             <el-form-item>
-                <el-button type="primary" @click="onSubmit" :plain="true">提交</el-button>
-                <el-button>取消</el-button>
+                <el-button type="primary" @click="onSubmit" :loading="isSubmitting" :plain="true">
+                    {{isSubmitting?"提交中...":"提交"}}
+                </el-button>
+                <el-button type="danger" @click="goBack">返回</el-button>
             </el-form-item>
 
         </el-form>
@@ -100,6 +104,7 @@
     export default {
         data() {
             return {
+                isSubmitting: false,
                 flag: '',
                 tagesFlag: 0,
                 tagsContent: '',
@@ -107,6 +112,8 @@
                 fileReader2: '',
                 fileList2: [],
                 fileList: [],
+                limitSize: 2209715200,
+                isExceedLimitSize: false,
                 form: {
                     name: '',
                     format: '',
@@ -118,15 +125,16 @@
                     order: '',
                     formatId: '',
                     size: '',
-                    userID: '3'
                 },
-                //fileList: [],
                 tags: [{name: null, type: ''}],
                 imageUrl: '',
                 fileReader: '',
-
-                actionUrl: `http://localhost:8081/IGSDN/img`,
-                options: []
+                options: [],
+                optionProps: {
+                    value: 'index',
+                    label: 'title',
+                    children: 'subs'
+                }
             };
         },
         computed: {},
@@ -135,8 +143,9 @@
                 console.error('Your browser does not support FileReader API!')
             }
             this.fileReader = new FileReader()
-            axios.get("/IGSDN/getDocumentCategories").then((res) => {
-                this.options = res.data.children
+            const preList = null
+            axios.post("/IGSDN/getAllCategoryTree", {preList}).then((res) => {
+                this.options = res.data[0]
             }).catch(error => {
 
             })
@@ -180,6 +189,7 @@
             },
             //文件
             getFile(options) {
+                this.isExceedLimitSize = false
                 let file = options.file
                 console.log(file)
                 let filename = file.name
@@ -187,7 +197,13 @@
                 this.fileList.push(file.key)
                 this.form.size = file.size
                 let suffix = filename.slice(filename.lastIndexOf('.'), filename.length)
-                this.form.name = filename.slice(0, filename.lastIndexOf('.'))
+
+                if (file.size > this.limitSize) {
+                    this.isExceedLimitSize = true
+                    this.form.name = "文件大小不可大于200MB"
+                } else {
+                    this.form.name = filename.slice(0, filename.lastIndexOf('.'))
+                }
                 axios.post("/IGSDN/getDocumentFormatName", {suffix}).then((res) => {
                     if (res.data[1] === '' || res.data[1] === null) {
                         this.form.format = "当前处理不了这类文件"
@@ -221,11 +237,22 @@
                     this.open1("当前处理不了这类文件")
                     return
                 }
+                if (!this.form.name) {
+                    this.open1("文件名称不可为空")
+                    return
+                }
                 if (!this.form.order) {
                     this.open1("请选择该文件所属类型")
                     return
                 }
-
+                if (this.isExceedLimitSize) {
+                    this.open1("该文件大小超过限制")
+                    return
+                }
+                if (!this.form.desc) {
+                    this.open1("文件描述不可为空")
+                    return
+                }
                 let isPublic
                 if (this.isPublic === '公有') {
                     isPublic = true
@@ -250,7 +277,7 @@
                 document.id = ''
                 document.name = this.form.name
                 document.isPublic = isPublic
-                document.uploader = this.form.userID
+                document.uploader = JSON.parse(localStorage.getItem('user_msg')).id
                 document.format = this.form.formatId
                 document.size = this.form.size
                 document.src = this.form.file
@@ -260,14 +287,24 @@
                 document.key1 = key1
                 document.key2 = key2
                 document.key3 = key3
+                this.isSubmitting = true
                 axios.post(
                     "/IGSDN/uploadFile", {'document': JSON.stringify(document)}
                 ).then((res) => {
                     if (res.data) {
-                        alert("提交成功")
+                        this.isSubmitting = false
+                        this.$message({
+                            message: '上传成功！',
+                            type: 'success'
+                        });
+                        window.location.reload()
                     }
                 }).catch(e => {
-
+                    this.isSubmitting = false
+                    this.$message({
+                        message: '上传失败！',
+                        type: 'error'
+                    });
                 })
             },
 
@@ -275,32 +312,30 @@
             httpRequest(options) {
                 let file = options.file
                 console.log(file)
-                let filename = file.name
+                if (!this.beforeAvatarUpload(file)) {
+                    this.$message.error('封面格式必须为图片！')
+                    return
+                }
                 if (file) {
                     this.fileReader.readAsDataURL(file)
                 }
                 this.fileReader.onload = () => {
                     let base64Str = this.fileReader.result
-                    let file = file
                     this.imageUrl = base64Str
                     this.form.photoBase64 = base64Str
                 }
+
             },
             beforeAvatarUpload(file) {
-                const isJPG = file.type === 'image/jpeg';
-                const isLt2M = file.size / 1024 / 1024 < 2;
-
-                if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
-                }
-                return isJPG && isLt2M;
+                const isImage = file.type.split("/")[0] === 'image'
+                return isImage;
             },
             handleRemoveImg(file, fileList2) {
                 this.imageUrl = ''
-
             },
-
-
+            goBack() {
+                this.$router.go(-1);
+            },
         }
 
     }

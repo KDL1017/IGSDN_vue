@@ -109,14 +109,14 @@
                 </div>
                 <div style="float: bottom;margin-top: 36px">
                     <el-input
-                            type="textarea"
-                            :autosize="{ minRows: 2, maxRows: 4}"
-                            placeholder="必须少于50个字符！"
+                            placeholder="不大于50个字符！"
                             maxlength="50"
+                            @keyup.enter.native="listenReplayDocument($event)"
                             v-model="remark_document" style="margin: 5px 0">
                     </el-input>
                     <el-checkbox v-model="isIdentify" style="margin: 5px 0">匿名</el-checkbox>
-                    <el-button style="float: right" type="info" @click="replayDocument">发布评论</el-button>
+                    <el-button type="primary" @click="replayDocument" style="float: right; margin: 5px 0">发布评论
+                    </el-button>
                 </div>
             </el-card>
         </transition>
@@ -125,9 +125,12 @@
 <script>
     import 'element-ui/lib/theme-chalk/base.css'
     import OnlinePreviewButton from './OnlinePreviewButton'
-    import axios from 'axios'
+
     import DocumentCommentsTree from './DocumentCommentsTree'
     import DocumentCommentsItem from './DocumentCommentsItem'
+    import axios from 'axios'
+    import moment from 'moment'
+    import PubSub from 'pubsub-js'
 
     export default {
         components: {
@@ -155,6 +158,7 @@
                     key3: '',
                     formatId: 0,
                     formatName: '',
+                    uploaderId: 0,
                     uploaderName: '',
                     intro: '',
                     downloadNum: 0
@@ -164,16 +168,44 @@
                 userId: 0,
                 message: '',
                 ///totalNum:9,
-                pageSize: 20,
+                pageSize: 10,
                 isShow: false,
-                current: 1,
                 activeName: '1',
                 firstLevel: [],
                 documentComment: {},
                 isShowInput: false,
-                content: '',
                 isShowOperation: false,
+                promptFlag: false
             }
+        },
+        mounted() {
+            this.isShowDocumentDetails = true
+            this.document = this.documentInit
+            this.document.id = this.$route.params.documentId
+            this.isPrivate = this.$route.params.isPrivate
+            this.userId = JSON.parse(localStorage.getItem("user_msg")).id
+            this.selectDocumentCommentByPageNum(1)
+            this.getDocumentDetails()
+            PubSub.subscribe('isCommentSuccess', (context, data) => {
+                console.log(data)
+                if (data) {
+                    let pageNum = this.documentComment.currentPage
+                    pageNum = pageNum ? pageNum : 1
+                    this.selectDocumentCommentByPageNum(pageNum)
+                }
+            })
+        }
+        ,
+        watch: {
+            $route() {
+                this.isShowDocumentDetails = true
+                this.document = this.documentInit
+                this.document.id = this.$route.params.documentId
+                this.isPrivate = this.$route.params.isPrivate
+                this.getDocumentDetails()
+                this.selectDocumentCommentByPageNum(1)
+            }
+            ,
         },
         methods: {
             goBack() {
@@ -206,81 +238,85 @@
             },
             selectDocumentCommentByPageNum(value) {
                 let documentId = this.document.id
+                const {userId, pageSize} = this
                 if (documentId && documentId != 0) {
                     // let userId = this.userId
                     let pageNum = value
-                    axios.post('/IGSDN/listDocumentComments', {documentId, pageNum}).then((res) => {
+                    axios.post('/IGSDN/listDocumentComments', {userId, documentId, pageNum, pageSize}).then((res) => {
                         this.documentComment = res.data
                         this.firstLevel = this.documentComment.data
                     }).catch((err) => {
-                        this.isLoading = false
-                        this.msg = '服务器请求超时，请检查网络连接！'
                     })
                 }
             },
-            replyComments(id) {
-                let documentComment2 = {};
-                documentComment2.isSecond = true
-                documentComment2.document = this.document.id
-                documentComment2.commentId = id
-                documentComment2.content = this.message
-                documentComment2.commentator = this.userID
-                documentComment2.remarkDate = moment().utc().format('YYYY-MM-DD')
-                documentComment2.isIdentify = this.isIdentify
-                documentComment2.id = null
-                axios.post("/IGSDN/replyDocumentComments", {'documentComment2': JSON.stringify(documentComment2)}).then((res) => {
-                    if (res.data) {
-                        alert("评论成功")
-                    } else {
-                        alert("评论失败")
-                    }
-                }).catch(error => {
 
-                })
+            listenReplayDocument(event) {
+                this.replayDocument()
+                event.preventDefault() // 阻止浏览器默认换行操作
+                return false
             },
             replayDocument() {
-                let documentComment = {};
-                documentComment.document = this.document.id
-                documentComment.content = this.remark_document
-                documentComment.commentator = this.userID
-                documentComment.remarkDate = moment().utc().format('YYYY-MM-DD')
-                documentComment.isIdentify = this.isIdentify
-                documentComment.id = null
-                axios.post("/IGSDN/remarkDocument", {'document': JSON.stringify(documentComment)}).then((res) => {
-                    if (res.data) {
-                        alert("评论成功")
-                    } else {
-                        alert("评论失败")
-                    }
-                }).catch(e => {
+                if (!this.promptFlag) {
+                    this.promptFlag = true
+                    this.$confirm('确认发布评论？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        const uploaderId = this.document.uploaderId
+                        if (uploaderId != this.userId) {
+                            // if (true) {
+                            let documentComment = {};
+                            documentComment.document = this.document.id
+                            documentComment.content = this.remark_document
+                            // documentComment.content = this.content
+                            documentComment.commentator = this.userId
+                            documentComment.remarkDate = moment().utc().format('YYYY-MM-DD')
+                            documentComment.isIdentify = this.isIdentify
+                            documentComment.id = null
 
-                })
+                            axios.post("/IGSDN/remarkDocument", {'document': JSON.stringify(documentComment)}).then((res) => {
+                                if (res.data) {
+                                    this.remark_document = ""
+                                    this.promptFlag = false
+                                    let pageNum = this.documentComment.currentPage
+                                    if (this.firstLevel.length == this.pageSize) {
+                                        pageNum++
+                                    }
+                                    this.selectDocumentCommentByPageNum(pageNum)
+                                    this.$message({
+                                        message: '评论成功',
+                                        type: 'success'
+                                    });
+
+                                } else {
+                                    this.promptFlag = false
+                                    this.$message({
+                                        message: '评论失败',
+                                        type: 'error'
+                                    });
+                                }
+                            }).catch(e => {
+
+                            })
+                        } else {
+                            this.$message({
+                                message: '抱歉，这是你自己发布的文件',
+                                type: 'error'
+                            });
+                        }
+
+                    }).catch(() => {
+                    });
+                }
             },
             receiveOpenMsg(data) {
                 let index = data[0]
                 let isOpen = data[1]
                 this.firstLevel[index].data.levelShow = isOpen
             }
-        },
-        created() {
-            this.isShowDocumentDetails = true
-            this.document = this.documentInit
-            this.document.id = this.$route.params.documentId
-            this.isPrivate = this.$route.params.isPrivate
-            this.userId = localStorage.getItem("user_msg") ? localStorage.getItem("user_msg").id : 2
-            this.selectDocumentCommentByPageNum(1)
-            this.getDocumentDetails()
-        },
-        watch: {
-            $route() {
-                this.isShowDocumentDetails = true
-                this.document = this.documentInit
-                this.document.id = this.$route.params.documentId
-                this.isPrivate = this.$route.params.isPrivate
-                this.getDocumentDetails()
-                this.selectDocumentCommentByPageNum(1)
-            },
-        },
+        }
+        ,
         computed: {
             simpleIntro() {
                 if (this.isShowAllIntro)
@@ -298,7 +334,8 @@
                     return "关闭"
                 else
                     return "展开"
-            },
+            }
+            ,
         }
     }
 </script>

@@ -25,6 +25,7 @@
                 documentId: 0,
                 content: '',
                 html: '',
+                isUpdate: false,
                 toolbars: {
                     bold: true, // 粗体
                     italic: true,// 斜体
@@ -53,12 +54,21 @@
             mavonEditor
         },
         mounted() {
+            this.isUpdate = false
+            this.isContentLoading = true
             const documentId = this.$route.query.documentId
             if (documentId) {
                 this.documentId = documentId
-                this.isContentLoading = true
                 this.isUpdateLoading = false
                 this.init()
+            }
+        },
+        watch: {
+            content() {
+                if (!this.isContentLoading) {
+                    this.isUpdate = true
+                }
+                this.isContentLoading = false
             }
         },
         computed: {
@@ -86,11 +96,11 @@
             //     })
             // },
             init() {
+                this.isContentLoading = true
                 this.content = ''
                 if (this.documentId && this.documentId != 0) {
                     axios.get('/IGSDN/getMarkdownContent/' + this.documentId).then((res) => {
                         this.content = res.data
-                        this.isContentLoading = false
                     }).catch((err) => {
                         this.$message.error('抱歉，加载失败！')
                     })

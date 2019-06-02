@@ -6,6 +6,9 @@
                 <template slot="title">
                     <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
                 </template>
+                <el-menu-item :index="item.index" :key="item.index" unique-opened router>
+                    <i :class="item.icon"></i><span slot="title">全部</span>
+                </el-menu-item>
                 <SidebarTree :items="item.subs"></SidebarTree>
             </el-submenu>
             <el-menu-item v-else :index="item.index" :key="item.index" unique-opened router>

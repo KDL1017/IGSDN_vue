@@ -39,10 +39,11 @@
 
 </template>
 <script>
-    import bus from '../common/bus';
+    import bus from '../common/bus'
+    import axios from 'axios'
+    import PubSub from 'pubsub-js'
 
     export default {
-
         data() {
             return {
                 collapse: false,
@@ -52,7 +53,6 @@
             }
         },
         methods: {
-            // 用户名下拉菜单选择事件
             handleCommand(command) {
                 if (command == 'loginout') {
                     localStorage.removeItem('t_user')
@@ -65,7 +65,6 @@
                 if (command == 'userCenter') {
                     this.$router.push('userCenter');
                 }
-
             },
 
 
@@ -100,13 +99,28 @@
                     }
                 }
                 this.fullscreen = !this.fullscreen;
+            },
+            getMessageNum() {
+                const userId = JSON.parse(localStorage.getItem('user_msg')).id
+                axios.get('/IGSDN/genUser/countUnReadUserInformationByUserId/' + userId).then((res) => {
+                    this.message = res.data
+                }).catch((error) => {
+                    console.log(error)
+                })
             }
+        },
+        created(){
+            this.uname = JSON.parse(localStorage.getItem('user_msg')).uname
         },
         mounted() {
             this.uname = JSON.parse(localStorage.getItem('user_msg')).uname
+            PubSub.subscribe('removeInformationNum', (event, data) => {
+                this.message -= data
+            })
             if (document.body.clientWidth < 1500) {
                 this.collapseChage();
             }
+            this.getMessageNum()
         }
     }
 </script>

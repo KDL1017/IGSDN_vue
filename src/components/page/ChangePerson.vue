@@ -10,7 +10,7 @@
                     <el-input type="name" v-model="personValidateForm.name" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="用户名称" prop="uname" :rules="[ { required: true, message: '用户名不能为空'}]">
-                    <el-input type="name" v-model="personValidateForm.uname" autocomplete="off"></el-input>
+                    <el-input type="uname" v-model="personValidateForm.uname" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="性别" prop="gender" :rules="[{ required: true, message: '性别不能为空'}]">
                     <el-radio-group type="gender" v-model="personValidateForm.gender" autocomplete="off">
@@ -38,9 +38,8 @@
     export default {
         name: "ChangePerson",
         mounted() {
-            const userId = JSON.parse(localStorage.getItem('user_msg')).id
-            // let loginName = t_user? t_user:user_msg
-            axios.get('/IGSDN/genUser/selectUserInfo/' + userId).then((res) => {
+            this.userId = JSON.parse(localStorage.getItem('user_msg')).id
+            axios.get('/IGSDN/genUser/selectUserInfo/' + this.userId).then((res) => {
                 this.personValidateForm.name = res.data.name
                 this.personValidateForm.uname = res.data.uname
                 this.personValidateForm.age = parseInt(res.data.age)
@@ -54,6 +53,7 @@
         },
         data() {
             return {
+                userId: null,
                 personValidateForm: {
                     uname: '',
                     name: '',
@@ -75,26 +75,25 @@
                             cancelButtonText: '取消',
                             type: 'warning'
                         }).then(() => {
-                            axios.put('/IGSDN/genUser/transformUserInfo', personValidateForm).then((res) => {
-                                if (res.data == true)
+                            axios.put('/IGSDN/genUser/updateUserInfo/' + this.userId, personValidateForm).then((res) => {
+                                if (res.data)
                                     this.$message({
                                         type: 'success',
                                         message: '修改成功!'
                                     })
-                                this.$router.push('userCenter');
+                                this.$router.push('userCenter')
                             }).catch(() => {
                                 this.$message({
                                     type: 'error',
                                     message: '修改失败，请检查网络连接!'
                                 })
-                                this.$router.push('userCenter');
+                                this.$router.push('userCenter')
                             })
 
                         }).catch(() => {
 
                         })
                     } else {
-                        console.log('error submit!!');
                         return false;
                     }
                 });
